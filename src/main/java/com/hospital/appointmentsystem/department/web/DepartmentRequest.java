@@ -1,5 +1,8 @@
 package com.hospital.appointmentsystem.department.web;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
 /**
  * ╔══════════════════════════════════════════════════════════════════╗
  * ║  📥 DEPARTMENT REQUEST — İstemciden Gelen Veri Modeli           ║
@@ -23,8 +26,11 @@ package com.hospital.appointmentsystem.department.web;
  */
 public class DepartmentRequest {
 
-    // İstemciden gelecek alanlar — id YOK (otomatik oluşacak)
+    @NotBlank(message = "Bölüm adı boş bırakılamaz")
+    @Size(min = 2, max = 100, message = "Bölüm adı en az 2, en fazla 100 karakter olmalıdır")
     private String name;
+
+    @Size(max = 255, message = "Açıklama en fazla 255 karakter olabilir")
     private String description;
 
     // Boş constructor — Spring JSON'dan objeye çevirirken kullanır

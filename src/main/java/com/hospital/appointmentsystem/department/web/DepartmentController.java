@@ -5,6 +5,7 @@ import com.hospital.appointmentsystem.department.api.DepartmentService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -85,7 +86,7 @@ public class DepartmentController {
     // ──────────────────────────────────────────────────────────
     @PostMapping
     public ResponseEntity<DepartmentResponse> createDepartment(
-            @RequestBody DepartmentRequest request) {
+            @Valid @RequestBody DepartmentRequest request) {
 
         // 1. Request → DTO dönüşümü
         DepartmentDto dto = mapRequestToDto(request);
@@ -145,7 +146,7 @@ public class DepartmentController {
     @PutMapping("/{id}")
     public ResponseEntity<DepartmentResponse> updateDepartment(
             @PathVariable Long id,
-            @RequestBody DepartmentRequest request) {
+            @Valid @RequestBody DepartmentRequest request) {
 
         DepartmentDto dto = mapRequestToDto(request);
         DepartmentDto updatedDto = departmentService.updateDepartment(id, dto);

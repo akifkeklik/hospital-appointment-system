@@ -1,5 +1,10 @@
 package com.hospital.appointmentsystem.doctor.web;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
 /**
  * 📥 Doctor Request — Doktor oluşturma/güncelleme isteği.
  *
@@ -19,11 +24,26 @@ package com.hospital.appointmentsystem.doctor.web;
  */
 public class DoctorRequest {
 
+    @NotBlank(message = "Ad alanı zorunludur")
+    @Size(max = 50, message = "Ad en fazla 50 karakter olabilir")
     private String firstName;
+
+    @NotBlank(message = "Soyad alanı zorunludur")
+    @Size(max = 50, message = "Soyad en fazla 50 karakter olabilir")
     private String lastName;
+
+    @NotBlank(message = "Uzmanlık alanı zorunludur")
+    @Size(max = 100, message = "Uzmanlık alanı en fazla 100 karakter olabilir")
     private String specialization;
+
+    @Size(max = 15, message = "Telefon numarası en fazla 15 karakter olabilir")
     private String phoneNumber;
+
+    @Email(message = "Geçerli bir e-posta adresi giriniz")
+    @Size(max = 100, message = "E-posta adresi çok uzun")
     private String email;
+
+    @NotNull(message = "Bölüm seçimi zorunludur")
     private Long departmentId; // ⭐ Hangi bölüme ait?
 
     public DoctorRequest() {

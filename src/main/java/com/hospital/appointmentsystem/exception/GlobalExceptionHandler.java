@@ -1,0 +1,59 @@
+package com.hospital.appointmentsystem.exception;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * 🛡️ GLOBAL EXCEPTION HANDLER
+ * 
+ * Bu sınıf, uygulamada fırlatılan tüm hataları (Exceptions) merkezi bir 
+ * noktadan yakalar ve Frontend'e (veya kullanıcıya) karmaşık Java hataları 
+ * yerine temiz, anlaşılır JSON mesajları döner.
+ */
+@ControllerAdvice
+public class GlobalExceptionHandler {
+
+    /**
+     * @Valid anotasyonu ile yakalanan doğrulama (Validation) hatalarını işler.
+     * Örneğin: Boş bırakılan isim, hatalı TC numarası vb.
+     */
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Map<String, Object>> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("timestamp", LocalDateTime.now());
+        response.put("status", HttpStatus.BAD_REQUEST.value());
+        response.put("error", "Validation Error");
+        
+        // Sadece hatalı alanları ve mesajları bir map'e doldur
+        Map<String, String> errors = new HashMap<>();
+        for (FieldError error : ex.getBindingResult().getFieldErrors()) {
+            errors.put(error.getField(), error.getDefaultMessage());
+        }
+        
+        response.put("details", errors);
+        
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * Diğer tüm beklenmedik hataları yakalar (Fallback).
+     */
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Map<String, Object>> handleAllExceptions(Exception ex) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("timestamp", LocalDateTime.now());
+        response.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
+        response.put("error", "Internal Server Error");
+        response.put("message", ex.getMessage());
+        
+        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+}

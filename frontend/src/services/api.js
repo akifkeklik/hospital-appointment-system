@@ -29,8 +29,22 @@ async function fetchAPI(endpoint, options = {}) {
 
     // Eğer başarılı değilse hata fırlat
     if (!response.ok) {
-      const errorData = await response.text(); // Backend'den gelen hata mesajı (varsa)
-      throw new Error(`API Error: ${response.status} - ${errorData || response.statusText}`);
+      let errorMessage = response.statusText;
+      try {
+        const errorData = await response.json();
+        if (errorData.details) {
+          // Validation error
+          const detailsStr = Object.values(errorData.details).join('\\n');
+          errorMessage = `${errorData.error}:\\n${detailsStr}`;
+        } else if (errorData.message) {
+          errorMessage = errorData.message;
+        }
+      } catch (e) {
+        // Not JSON, just use raw text
+        const rawText = await response.text();
+        if (rawText) errorMessage = rawText;
+      }
+      throw new Error(errorMessage);
     }
 
     // 204 No Content ise boş dön (Örn: DELETE işleminde)

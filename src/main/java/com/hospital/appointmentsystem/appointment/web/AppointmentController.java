@@ -5,6 +5,7 @@ import com.hospital.appointmentsystem.appointment.api.AppointmentService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 
 import java.util.List;
 import java.util.Map;
@@ -29,7 +30,7 @@ public class AppointmentController {
     // POST /api/appointments — Yeni randevu oluştur
     @PostMapping
     public ResponseEntity<AppointmentResponse> createAppointment(
-            @RequestBody AppointmentRequest request) {
+            @Valid @RequestBody AppointmentRequest request) {
 
         AppointmentDto dto = mapRequestToDto(request);
         AppointmentDto createdDto = appointmentService.createAppointment(dto);
@@ -90,7 +91,7 @@ public class AppointmentController {
     @PutMapping("/{id}")
     public ResponseEntity<AppointmentResponse> updateAppointment(
             @PathVariable Long id,
-            @RequestBody AppointmentRequest request) {
+            @Valid @RequestBody AppointmentRequest request) {
 
         AppointmentDto dto = mapRequestToDto(request);
         AppointmentDto updatedDto = appointmentService.updateAppointment(id, dto);

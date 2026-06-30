@@ -5,6 +5,7 @@ import com.hospital.appointmentsystem.patient.api.PatientService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,7 +29,7 @@ public class PatientController {
     // POST /api/patients — Yeni hasta oluştur
     @PostMapping
     public ResponseEntity<PatientResponse> createPatient(
-            @RequestBody PatientRequest request) {
+            @Valid @RequestBody PatientRequest request) {
 
         PatientDto dto = mapRequestToDto(request);
         PatientDto createdDto = patientService.createPatient(dto);
@@ -63,7 +64,7 @@ public class PatientController {
     @PutMapping("/{id}")
     public ResponseEntity<PatientResponse> updatePatient(
             @PathVariable Long id,
-            @RequestBody PatientRequest request) {
+            @Valid @RequestBody PatientRequest request) {
 
         PatientDto dto = mapRequestToDto(request);
         PatientDto updatedDto = patientService.updatePatient(id, dto);

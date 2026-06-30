@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { DepartmentService, PatientService, DoctorService, AppointmentService } from '../services/api';
+import DashboardCharts from '../components/DashboardCharts';
 import styles from './page.module.css';
 
 export default function Dashboard() {
@@ -10,6 +11,11 @@ export default function Dashboard() {
     patients: 0,
     doctors: 0,
     appointments: 0
+  });
+  const [chartData, setChartData] = useState({
+    departments: [],
+    doctors: [],
+    appointments: []
   });
   const [loading, setLoading] = useState(true);
 
@@ -28,6 +34,12 @@ export default function Dashboard() {
           patients: pats.length,
           doctors: docs.length,
           appointments: appts.length
+        });
+
+        setChartData({
+          departments: depts,
+          doctors: docs,
+          appointments: appts
         });
       } catch (error) {
         console.error("Dashboard istatistikleri alınamadı", error);
@@ -80,6 +92,14 @@ export default function Dashboard() {
             </div>
           </Link>
         </div>
+      )}
+
+      {!loading && (
+        <DashboardCharts 
+          departments={chartData.departments}
+          doctors={chartData.doctors}
+          appointments={chartData.appointments}
+        />
       )}
     </div>
   );
