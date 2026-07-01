@@ -1,6 +1,8 @@
 package com.hospital.appointmentsystem.department.api;
 
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 /**
  * ╔══════════════════════════════════════════════════════════════════╗
@@ -56,7 +58,7 @@ public interface DepartmentService {
      *
      * @return Bölüm listesi
      */
-    List<DepartmentDto> getAllDepartments();
+    Page<DepartmentDto> getAllDepartments(Pageable pageable);
 
     /**
      * Var olan bir bölümü günceller.

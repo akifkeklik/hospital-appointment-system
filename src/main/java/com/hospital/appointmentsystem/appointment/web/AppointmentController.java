@@ -10,6 +10,8 @@ import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 /**
  * 🌐 Appointment Controller — Randevu REST API Endpoint'leri
@@ -51,12 +53,10 @@ public class AppointmentController {
 
     // GET /api/appointments — Tüm randevuları listele
     @GetMapping
-    public ResponseEntity<List<AppointmentResponse>> getAllAppointments() {
+    public ResponseEntity<Page<AppointmentResponse>> getAllAppointments(Pageable pageable) {
 
-        List<AppointmentDto> dtos = appointmentService.getAllAppointments();
-        List<AppointmentResponse> responses = dtos.stream()
-                .map(this::mapDtoToResponse)
-                .collect(Collectors.toList());
+        Page<AppointmentDto> dtos = appointmentService.getAllAppointments(pageable);
+        Page<AppointmentResponse> responses = dtos.map(this::mapDtoToResponse);
 
         return ResponseEntity.ok(responses);
     }

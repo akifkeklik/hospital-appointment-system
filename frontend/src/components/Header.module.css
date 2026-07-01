@@ -1,11 +1,16 @@
 .header {
-  height: 70px;
-  background-color: var(--surface);
-  border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 2rem;
+  padding: 1.25rem 2.5rem;
+  background-color: rgba(var(--surface-rgb), 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(var(--surface-rgb), 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
 }
 
 .search {
@@ -19,30 +24,65 @@
 }
 
 .avatar {
-  width: 40px;
-  height: 40px;
-  background-color: var(--primary);
+  width: 44px;
+  height: 44px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-hover));
   color: white;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: bold;
-  font-size: 1.25rem;
+  font-weight: 700;
+  font-size: 1.1rem;
+  box-shadow: 0 4px 8px rgba(var(--primary-rgb), 0.12);
+  border: 2px solid var(--surface);
 }
 
 .info {
   display: flex;
   flex-direction: column;
+  max-width: 140px;
 }
 
 .name {
   font-weight: 600;
   color: var(--secondary);
   font-size: 0.9rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .role {
   color: var(--text-muted);
   font-size: 0.75rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+.themeToggle {
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: 0.6rem;
+  border-radius: 12px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-main);
+  background-color: var(--background);
+  border: 1px solid var(--border);
+}
+.themeToggle:hover {
+  background-color: var(--border);
+  transform: translateY(-2px);
+}
+

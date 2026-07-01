@@ -9,6 +9,8 @@ import jakarta.validation.Valid;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 /**
  * 🌐 Doctor Controller — Doktor REST API Endpoint'leri
@@ -51,12 +53,10 @@ public class DoctorController {
 
     // GET /api/doctors — Tüm doktorları listele
     @GetMapping
-    public ResponseEntity<List<DoctorResponse>> getAllDoctors() {
+    public ResponseEntity<Page<DoctorResponse>> getAllDoctors(Pageable pageable) {
 
-        List<DoctorDto> dtos = doctorService.getAllDoctors();
-        List<DoctorResponse> responses = dtos.stream()
-                .map(this::mapDtoToResponse)
-                .collect(Collectors.toList());
+        Page<DoctorDto> dtos = doctorService.getAllDoctors(pageable);
+        Page<DoctorResponse> responses = dtos.map(this::mapDtoToResponse);
 
         return ResponseEntity.ok(responses);
     }

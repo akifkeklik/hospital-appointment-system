@@ -1,6 +1,8 @@
 package com.hospital.appointmentsystem.appointment.api;
 
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 /**
  * 📋 Appointment Service Interface — Randevu iş mantığı sözleşmesi.
@@ -11,7 +13,7 @@ public interface AppointmentService {
 
     AppointmentDto getAppointmentById(Long id);
 
-    List<AppointmentDto> getAllAppointments();
+    Page<AppointmentDto> getAllAppointments(Pageable pageable);
 
     /** Hastanın tüm randevularını getir */
     List<AppointmentDto> getAppointmentsByPatientId(Long patientId);

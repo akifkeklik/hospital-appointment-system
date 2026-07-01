@@ -9,6 +9,8 @@ import jakarta.validation.Valid;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 /**
  * ╔══════════════════════════════════════════════════════════════════╗
@@ -126,13 +128,10 @@ public class DepartmentController {
     // 📌 GET /api/departments — Tüm Bölümleri Listele
     // ──────────────────────────────────────────────────────────
     @GetMapping
-    public ResponseEntity<List<DepartmentResponse>> getAllDepartments() {
+    public ResponseEntity<Page<DepartmentResponse>> getAllDepartments(Pageable pageable) {
 
-        List<DepartmentDto> dtos = departmentService.getAllDepartments();
-
-        List<DepartmentResponse> responses = dtos.stream()
-                .map(this::mapDtoToResponse)
-                .collect(Collectors.toList());
+        Page<DepartmentDto> dtos = departmentService.getAllDepartments(pageable);
+        Page<DepartmentResponse> responses = dtos.map(this::mapDtoToResponse);
 
         return ResponseEntity.ok(responses);
     }

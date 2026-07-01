@@ -3,12 +3,17 @@ import { useState, useEffect } from 'react';
 import { AppointmentService, PatientService, DoctorService } from '../../services/api';
 import DataTable from '../../components/DataTable';
 import Modal from '../../components/Modal';
+import { toast } from '../../components/Toast';
+import { useSettings } from '../../context/SettingsContext';
 import styles from '../shared.module.css';
 
 export default function AppointmentsPage() {
+  const { t } = useSettings();
   const [appointments, setAppointments] = useState([]);
   const [patients, setPatients] = useState([]);
   const [doctors, setDoctors] = useState([]);
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({ 
     patientId: '', doctorId: '', appointmentDate: '', notes: '' 
@@ -18,26 +23,27 @@ export default function AppointmentsPage() {
   const fetchData = async () => {
     try {
       const [appts, pats, docs] = await Promise.all([
-        AppointmentService.getAll(),
-        PatientService.getAll(),
-        DoctorService.getAll()
+        AppointmentService.getAll(page),
+        PatientService.getAll(0, 1000),
+        DoctorService.getAll(0, 1000)
       ]);
-      setAppointments(appts);
-      setPatients(pats);
-      setDoctors(docs);
+      setAppointments(appts.content || []);
+      setTotalPages(appts.totalPages || 0);
+      setPatients(pats.content || []);
+      setDoctors(docs.content || []);
     } catch (error) {
-      alert('Veriler yüklenemedi.');
+      toast.error('Veriler yüklenemedi.');
     }
   };
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [page]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.patientId || !formData.doctorId || !formData.appointmentDate) {
-      alert('Lütfen tüm zorunlu alanları doldurun.');
+      toast.error('Lütfen tüm zorunlu alanları doldurun.');
       return;
     }
     
@@ -50,8 +56,9 @@ export default function AppointmentsPage() {
       setIsModalOpen(false);
       setEditingId(null);
       fetchData();
+      toast.success(editingId ? 'Randevu başarıyla güncellendi.' : 'Randevu başarıyla oluşturuldu.');
     } catch (error) {
-      alert('Randevu işlemi başarısız oldu.');
+      toast.error(`İşlem başarısız oldu:\n${error.message}`);
     }
   };
 
@@ -71,8 +78,9 @@ export default function AppointmentsPage() {
       try {
         await AppointmentService.delete(id);
         fetchData();
+        toast.success('Randevu başarıyla silindi.');
       } catch (error) {
-        alert('Silme işlemi başarısız.');
+        toast.error('Silme işlemi başarısız.');
       }
     }
   };
@@ -81,54 +89,58 @@ export default function AppointmentsPage() {
     try {
       await AppointmentService.updateStatus(id, newStatus);
       fetchData();
+      toast.success('Randevu durumu güncellendi.');
     } catch (error) {
-      alert('Durum güncellenemedi.');
+      toast.error(`Durum güncellenemedi:\n${error.message}`);
     }
   };
 
   const getStatusBadge = (status) => {
     const statusConfig = {
-      SCHEDULED: { label: 'Planlandı', color: '#3b82f6', bg: '#eff6ff' },
-      COMPLETED: { label: 'Tamamlandı', color: '#10b981', bg: '#ecfdf5' },
-      CANCELLED: { label: 'İptal', color: '#ef4444', bg: '#fef2f2' },
-      NO_SHOW: { label: 'Gelmedi', color: '#f59e0b', bg: '#fffbeb' }
+      SCHEDULED: { label: t('status_scheduled'), color: '#3b82f6', bg: '#eff6ff' },
+      COMPLETED: { label: t('status_completed'), color: '#10b981', bg: '#ecfdf5' },
+      CANCELLED: { label: t('status_cancelled'), color: '#ef4444', bg: '#fef2f2' },
+      NO_SHOW: { label: t('status_no_show'), color: '#f59e0b', bg: '#fffbeb' }
     };
     
     const conf = statusConfig[status] || { label: status, color: '#64748b', bg: '#f1f5f9' };
     return (
       <span style={{ 
-        padding: '4px 8px', borderRadius: '12px', fontSize: '0.75rem', fontWeight: '600',
-        color: conf.color, backgroundColor: conf.bg 
+        display: 'inline-flex', alignItems: 'center', gap: '6px',
+        padding: '4px 10px', borderRadius: '6px', fontSize: '0.65rem', 
+        fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.5px',
+        color: conf.color, backgroundColor: `${conf.color}15`, border: `1px solid ${conf.color}30`
       }}>
+        <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: conf.color }}></span>
         {conf.label}
       </span>
     );
   };
 
   const columns = [
-    { header: 'Hasta', accessor: 'patientFullName' },
-    { header: 'Doktor', render: (row) => `${row.doctorFullName} (${row.departmentName})` },
-    { header: 'Tarih', render: (row) => new Date(row.appointmentDate).toLocaleString('tr-TR') },
-    { header: 'Durum', render: (row) => getStatusBadge(row.status) }
+    { header: t('patient'), accessor: 'patientFullName' },
+    { header: t('doctor'), render: (row) => `${row.doctorFullName} (${t(row.departmentName)})` },
+    { header: t('date'), render: (row) => new Date(row.appointmentDate).toLocaleString('tr-TR') },
+    { header: t('status'), render: (row) => getStatusBadge(row.status) }
   ];
 
   const renderActions = (row) => (
     <select 
       value={row.status} 
       onChange={(e) => handleStatusChange(row.id, e.target.value)}
-      style={{ padding: '0.25rem', borderRadius: '4px', border: '1px solid #e2e8f0', fontSize: '0.75rem', marginRight: '5px' }}
+      style={{ padding: '0.25rem', borderRadius: '4px', border: '1px solid #e2e8f0', fontSize: '0.75rem', marginRight: '5px', backgroundColor: 'var(--surface)', color: 'var(--text-main)' }}
     >
-      <option value="SCHEDULED">Planlandı</option>
-      <option value="COMPLETED">Tamamlandı</option>
-      <option value="CANCELLED">İptal</option>
-      <option value="NO_SHOW">Gelmedi</option>
+      <option value="SCHEDULED">{t('status_scheduled')}</option>
+      <option value="COMPLETED">{t('status_completed')}</option>
+      <option value="CANCELLED">{t('status_cancelled')}</option>
+      <option value="NO_SHOW">{t('status_no_show')}</option>
     </select>
   );
 
   return (
     <div>
       <div className={styles.pageHeader}>
-        <h1 className={styles.pageTitle}>Randevular</h1>
+        <h1 className={styles.pageTitle}>{t('appointments')}</h1>
         <button 
           className={styles.primaryBtn} 
           onClick={() => {
@@ -137,7 +149,7 @@ export default function AppointmentsPage() {
             setIsModalOpen(true);
           }}
         >
-          + Randevu Oluştur
+          + {t('create_appointment')}
         </button>
       </div>
 
@@ -147,6 +159,9 @@ export default function AppointmentsPage() {
         onEdit={handleEdit} 
         onDelete={handleDelete}
         actions={renderActions}
+        page={page}
+        totalPages={totalPages}
+        onPageChange={setPage}
       />
 
       <Modal 
@@ -204,8 +219,8 @@ export default function AppointmentsPage() {
           </div>
           
           <div className={styles.formActions}>
-            <button type="button" className={styles.cancelBtn} onClick={() => setIsModalOpen(false)}>İptal</button>
-            <button type="submit" className={styles.primaryBtn}>Kaydet</button>
+            <button type="button" className={styles.cancelBtn} onClick={() => setIsModalOpen(false)}>{t('cancel')}</button>
+            <button type="submit" className={styles.primaryBtn}>{t('save')}</button>
           </div>
         </form>
       </Modal>

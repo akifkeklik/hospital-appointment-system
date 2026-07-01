@@ -2,6 +2,8 @@ package com.hospital.appointmentsystem;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
  * ╔══════════════════════════════════════════════════════════════════╗
@@ -42,5 +44,16 @@ public class HospitalAppointmentApplication {
         //   3. Tüm @Controller, @Service, @Repository sınıflarını yükler
         //   4. JPA Entity'lerine bakarak veritabanı tablolarını oluşturur
         SpringApplication.run(HospitalAppointmentApplication.class, args);
+    }
+
+    @Bean
+    public org.springframework.boot.CommandLineRunner fixNullIsActive(JdbcTemplate jdbcTemplate) {
+        return args -> {
+            jdbcTemplate.execute("UPDATE departments SET is_active = 1 WHERE is_active IS NULL");
+            jdbcTemplate.execute("UPDATE patients SET is_active = 1 WHERE is_active IS NULL");
+            jdbcTemplate.execute("UPDATE doctors SET is_active = 1 WHERE is_active IS NULL");
+            jdbcTemplate.execute("UPDATE appointments SET is_active = 1 WHERE is_active IS NULL");
+            System.out.println("✅ Eski veriler Soft Delete (is_active=1) ile başarıyla güncellendi.");
+        };
     }
 }

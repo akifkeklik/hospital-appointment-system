@@ -8,6 +8,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Column;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 /**
  * ╔══════════════════════════════════════════════════════════════════╗
@@ -52,6 +54,8 @@ import jakarta.persistence.Column;
 // Genellikle çoğul isim kullanılır: department → departments
 // ──────────────────────────────────────────────────────────────
 @Table(name = "departments")
+@SQLDelete(sql = "UPDATE departments SET is_active = false WHERE id=?")
+@SQLRestriction("is_active = true")
 public class Department {
 
     // ──────────────────────────────────────────────────────────
@@ -93,6 +97,9 @@ public class Department {
 
     @Column(name = "description", length = 500)
     private String description;
+
+    @Column(name = "is_active")
+    private Boolean isActive = true;
 
     // ──────────────────────────────────────────────────────────
     // 📌 CONSTRUCTOR'LAR (Yapıcı Metotlar)
@@ -157,5 +164,13 @@ public class Department {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Boolean getIsActive() {
+        return isActive;
+    }
+
+    public void setIsActive(Boolean isActive) {
+        this.isActive = isActive;
     }
 }

@@ -6,6 +6,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Column;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 /**
  * ╔══════════════════════════════════════════════════════════════════╗
@@ -20,7 +22,7 @@ import jakarta.persistence.Column;
  * ║  ┌────┬──────┬───────┬─────────────┬──────────┬────────────┐    ║
  * ║  │ id │ first│ last  │ tc_identity │ phone    │ email      │    ║
  * ║  │    │ _name│ _name │ _number     │ _number  │            │    ║
- * ║  ├────┼──────┼───────┼─────────────┼──────────┼────────────┤    ║
+ * ├────┼──────┼───────┼─────────────┼──────────┼────────────┤    ║
  * ║  │ 1  │ Ahmet│ Yılmaz│ 12345678901 │ 05551234 │ a@mail.com │    ║
  * ║  └────┴──────┴───────┴─────────────┴──────────┴────────────┘    ║
  * ║                                                                  ║
@@ -28,6 +30,8 @@ import jakarta.persistence.Column;
  */
 @Entity
 @Table(name = "patients")
+@SQLDelete(sql = "UPDATE patients SET is_active = false WHERE id=?")
+@SQLRestriction("is_active = true")
 public class Patient {
 
     @Id
@@ -66,6 +70,9 @@ public class Patient {
 
     @Column(name = "email", length = 100)
     private String email;
+
+    @Column(name = "is_active")
+    private Boolean isActive = true;
 
     // JPA için ZORUNLU — parametresiz constructor
     public Patient() {

@@ -9,6 +9,8 @@ import jakarta.validation.Valid;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 /**
  * 🌐 Patient Controller — Hasta REST API Endpoint'leri
@@ -50,12 +52,10 @@ public class PatientController {
 
     // GET /api/patients — Tüm hastaları listele
     @GetMapping
-    public ResponseEntity<List<PatientResponse>> getAllPatients() {
+    public ResponseEntity<Page<PatientResponse>> getAllPatients(Pageable pageable) {
 
-        List<PatientDto> dtos = patientService.getAllPatients();
-        List<PatientResponse> responses = dtos.stream()
-                .map(this::mapDtoToResponse)
-                .collect(Collectors.toList());
+        Page<PatientDto> dtos = patientService.getAllPatients(pageable);
+        Page<PatientResponse> responses = dtos.map(this::mapDtoToResponse);
 
         return ResponseEntity.ok(responses);
     }

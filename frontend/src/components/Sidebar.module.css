@@ -1,27 +1,69 @@
 .sidebar {
-  width: 250px;
+  width: 260px;
+  min-width: 260px;
+  max-width: 260px;
   background-color: var(--surface);
   border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
   height: 100vh;
+  flex-shrink: 0;
 }
 
 .logo {
   padding: 1.5rem;
   border-bottom: 1px solid var(--border);
-  text-align: center;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 
-.logo h2 {
-  color: var(--primary);
-  font-size: 1.5rem;
-  margin-bottom: 0.25rem;
+.logoIcon {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+  color: white;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 8px rgba(var(--primary-rgb), 0.15);
 }
 
-.logo p {
+.logoIcon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.logoText {
+  display: flex;
+  flex-direction: column;
+}
+
+.logoText h2 {
+  font-size: 1.25rem;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  margin: 0;
+  line-height: 1.2;
+  background: linear-gradient(90deg, var(--text-main), var(--primary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 2px 10px rgba(var(--primary-rgb), 0.2);
+}
+
+.logoText p {
   color: var(--text-muted);
-  font-size: 0.875rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 160px;
 }
 
 .nav {
@@ -36,9 +78,10 @@
   display: flex;
   align-items: center;
   padding: 0.75rem 1rem;
-  border-radius: 8px;
+  border-radius: 6px;
   color: var(--text-main);
-  font-weight: 500;
+  font-weight: 600;
+  letter-spacing: 0.2px;
   transition: all 0.2s ease;
 }
 

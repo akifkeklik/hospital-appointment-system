@@ -3,11 +3,16 @@ import { useState, useEffect } from 'react';
 import { DoctorService, DepartmentService } from '../../services/api';
 import DataTable from '../../components/DataTable';
 import Modal from '../../components/Modal';
+import { toast } from '../../components/Toast';
+import { useSettings } from '../../context/SettingsContext';
 import styles from '../shared.module.css';
 
 export default function DoctorsPage() {
+  const { t } = useSettings();
   const [doctors, setDoctors] = useState([]);
   const [departments, setDepartments] = useState([]);
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({ 
     firstName: '', lastName: '', specialization: '', phoneNumber: '', email: '', departmentId: '' 
@@ -17,24 +22,25 @@ export default function DoctorsPage() {
   const fetchData = async () => {
     try {
       const [docs, depts] = await Promise.all([
-        DoctorService.getAll(),
-        DepartmentService.getAll()
+        DoctorService.getAll(page),
+        DepartmentService.getAll(0, 1000)
       ]);
-      setDoctors(docs);
-      setDepartments(depts);
+      setDoctors(docs.content || []);
+      setTotalPages(docs.totalPages || 0);
+      setDepartments(depts.content || []);
     } catch (error) {
-      alert('Veriler yüklenemedi.');
+      toast.error('Veriler yüklenemedi.');
     }
   };
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [page]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.departmentId) {
-      alert('Lütfen bir bölüm seçin.');
+      toast.error('Lütfen bir bölüm seçin.');
       return;
     }
     
@@ -47,8 +53,9 @@ export default function DoctorsPage() {
       setIsModalOpen(false);
       setEditingId(null);
       fetchData();
+      toast.success(editingId ? 'Doktor başarıyla güncellendi.' : 'Doktor başarıyla eklendi.');
     } catch (error) {
-      alert('İşlem başarısız oldu.');
+      toast.error(`İşlem başarısız oldu:\n${error.message}`);
     }
   };
 
@@ -70,23 +77,24 @@ export default function DoctorsPage() {
       try {
         await DoctorService.delete(id);
         fetchData();
+        toast.success('Doktor başarıyla silindi.');
       } catch (error) {
-        alert('Silme işlemi başarısız. Doktorun randevuları olabilir.');
+        toast.error('Silme işlemi başarısız. Doktorun randevuları olabilir.');
       }
     }
   };
 
   const columns = [
-    { header: 'Unvan/Ad Soyad', render: (row) => `${row.specialization} ${row.firstName} ${row.lastName}` },
-    { header: 'Bölüm', accessor: 'departmentName' },
-    { header: 'Telefon', accessor: 'phoneNumber' },
-    { header: 'E-Posta', accessor: 'email' }
+    { header: t('title_desc'), render: (row) => `${row.specialization} ${row.firstName} ${row.lastName}` },
+    { header: t('department'), render: (row) => t(row.departmentName) },
+    { header: t('phone'), accessor: 'phoneNumber' },
+    { header: t('email'), accessor: 'email' }
   ];
 
   return (
     <div>
       <div className={styles.pageHeader}>
-        <h1 className={styles.pageTitle}>Doktorlar</h1>
+        <h1 className={styles.pageTitle}>{t('doctors')}</h1>
         <button 
           className={styles.primaryBtn} 
           onClick={() => {
@@ -95,7 +103,7 @@ export default function DoctorsPage() {
             setIsModalOpen(true);
           }}
         >
-          + Yeni Doktor Ekle
+          + {t('add_doctor')}
         </button>
       </div>
 
@@ -104,6 +112,9 @@ export default function DoctorsPage() {
         data={doctors} 
         onEdit={handleEdit} 
         onDelete={handleDelete} 
+        page={page}
+        totalPages={totalPages}
+        onPageChange={setPage}
       />
 
       <Modal 
@@ -151,8 +162,8 @@ export default function DoctorsPage() {
             <input type="email" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} />
           </div>
           <div className={styles.formActions}>
-            <button type="button" className={styles.cancelBtn} onClick={() => setIsModalOpen(false)}>İptal</button>
-            <button type="submit" className={styles.primaryBtn}>Kaydet</button>
+            <button type="button" className={styles.cancelBtn} onClick={() => setIsModalOpen(false)}>{t('cancel')}</button>
+            <button type="submit" className={styles.primaryBtn}>{t('save')}</button>
           </div>
         </form>
       </Modal>

@@ -8,8 +8,11 @@ import com.hospital.appointmentsystem.patient.impl.Patient;
 import com.hospital.appointmentsystem.patient.impl.PatientRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 /**
  * ╔══════════════════════════════════════════════════════════════════╗
@@ -79,10 +82,9 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
 
     @Override
-    public List<AppointmentDto> getAllAppointments() {
-        return appointmentRepository.findAll().stream()
-                .map(this::mapToDto)
-                .collect(Collectors.toList());
+    public Page<AppointmentDto> getAllAppointments(Pageable pageable) {
+        Page<Appointment> appointments = appointmentRepository.findAll(pageable);
+        return appointments.map(this::mapToDto);
     }
 
     @Override
@@ -127,7 +129,12 @@ public class AppointmentServiceImpl implements AppointmentService {
 
         // Durum gönderildiyse güncelle
         if (appointmentDto.getStatus() != null) {
-            existingAppointment.setStatus(AppointmentStatus.valueOf(appointmentDto.getStatus()));
+            AppointmentStatus newStatus = AppointmentStatus.valueOf(appointmentDto.getStatus());
+            if ((newStatus == AppointmentStatus.COMPLETED || newStatus == AppointmentStatus.NO_SHOW) 
+                && appointmentDto.getAppointmentDate().isAfter(LocalDateTime.now())) {
+                throw new RuntimeException("Gelecekteki bir randevu 'Tamamlandı' veya 'Gelmedi' olarak işaretlenemez!");
+            }
+            existingAppointment.setStatus(newStatus);
         }
 
         Appointment updatedAppointment = appointmentRepository.save(existingAppointment);
@@ -154,6 +161,13 @@ public class AppointmentServiceImpl implements AppointmentService {
         // "COMPLETED" → AppointmentStatus.COMPLETED
         try {
             AppointmentStatus newStatus = AppointmentStatus.valueOf(status.toUpperCase());
+            
+            // ⭐ İŞ KURALI: Gelecekteki bir randevu 'Tamamlandı' veya 'Gelmedi' yapılamaz
+            if ((newStatus == AppointmentStatus.COMPLETED || newStatus == AppointmentStatus.NO_SHOW) 
+                && appointment.getAppointmentDate().isAfter(LocalDateTime.now())) {
+                throw new RuntimeException("Gelecekteki bir randevu 'Tamamlandı' veya 'Gelmedi' olarak işaretlenemez!");
+            }
+            
             appointment.setStatus(newStatus);
         } catch (IllegalArgumentException e) {
             throw new RuntimeException(

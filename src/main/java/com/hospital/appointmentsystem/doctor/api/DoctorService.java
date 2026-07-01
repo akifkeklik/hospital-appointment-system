@@ -1,6 +1,8 @@
 package com.hospital.appointmentsystem.doctor.api;
 
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 /**
  * 📋 Doctor Service Interface — Doktor iş mantığı sözleşmesi.
@@ -11,7 +13,7 @@ public interface DoctorService {
 
     DoctorDto getDoctorById(Long id);
 
-    List<DoctorDto> getAllDoctors();
+    Page<DoctorDto> getAllDoctors(Pageable pageable);
 
     /**
      * Belirli bir bölümdeki doktorları getirir.

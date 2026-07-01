@@ -1,8 +1,8 @@
 .chartsContainer {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-  gap: 2rem;
-  margin-top: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
 }
 
 .chartBox {
@@ -10,7 +10,12 @@
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 1.5rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+  transition: box-shadow 0.3s ease;
+}
+
+.chartBox:hover {
+  box-shadow: var(--shadow-lg);
 }
 
 .chartTitle {

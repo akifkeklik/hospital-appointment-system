@@ -2,6 +2,8 @@ package com.hospital.appointmentsystem.doctor.impl;
 
 import com.hospital.appointmentsystem.department.impl.Department;
 import jakarta.persistence.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 /**
  * ╔══════════════════════════════════════════════════════════════════╗
@@ -37,6 +39,8 @@ import jakarta.persistence.*;
  */
 @Entity
 @Table(name = "doctors")
+@SQLDelete(sql = "UPDATE doctors SET is_active = false WHERE id=?")
+@SQLRestriction("is_active = true")
 public class Doctor {
 
     @Id
@@ -61,6 +65,9 @@ public class Doctor {
 
     @Column(name = "email", length = 100)
     private String email;
+
+    @Column(name = "is_active")
+    private Boolean isActive = true;
 
     // ══════════════════════════════════════════════════════════
     //  ⭐ İLİŞKİ TANIMLAMASI — En önemli kısım!
@@ -154,6 +161,14 @@ public class Doctor {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public Boolean getIsActive() {
+        return isActive;
+    }
+
+    public void setIsActive(Boolean isActive) {
+        this.isActive = isActive;
     }
 
     // ⭐ Department ilişkisi getter/setter

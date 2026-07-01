@@ -3,6 +3,8 @@ package com.hospital.appointmentsystem.appointment.impl;
 import com.hospital.appointmentsystem.doctor.impl.Doctor;
 import com.hospital.appointmentsystem.patient.impl.Patient;
 import jakarta.persistence.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDateTime;
 
@@ -38,6 +40,8 @@ import java.time.LocalDateTime;
  */
 @Entity
 @Table(name = "appointments")
+@SQLDelete(sql = "UPDATE appointments SET is_active = false WHERE id=?")
+@SQLRestriction("is_active = true")
 public class Appointment {
 
     @Id
@@ -99,6 +103,9 @@ public class Appointment {
     @Column(name = "notes", length = 500)
     private String notes;
 
+    @Column(name = "is_active")
+    private Boolean isActive = true;
+
     // JPA için ZORUNLU
     public Appointment() {
     }
@@ -151,5 +158,13 @@ public class Appointment {
 
     public void setNotes(String notes) {
         this.notes = notes;
+    }
+
+    public Boolean getIsActive() {
+        return isActive;
+    }
+
+    public void setIsActive(Boolean isActive) {
+        this.isActive = isActive;
     }
 }

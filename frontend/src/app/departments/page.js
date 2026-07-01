@@ -3,26 +3,32 @@ import { useState, useEffect } from 'react';
 import { DepartmentService } from '../../services/api';
 import DataTable from '../../components/DataTable';
 import Modal from '../../components/Modal';
+import { toast } from '../../components/Toast';
+import { useSettings } from '../../context/SettingsContext';
 import styles from '../shared.module.css';
 
 export default function DepartmentsPage() {
+  const { t } = useSettings();
   const [departments, setDepartments] = useState([]);
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({ name: '', description: '' });
   const [editingId, setEditingId] = useState(null);
 
   const fetchDepartments = async () => {
     try {
-      const data = await DepartmentService.getAll();
-      setDepartments(data);
+      const data = await DepartmentService.getAll(page);
+      setDepartments(data.content || []);
+      setTotalPages(data.totalPages || 0);
     } catch (error) {
-      alert('Bölümler yüklenemedi.');
+      toast.error('Bölümler yüklenemedi.');
     }
   };
 
   useEffect(() => {
     fetchDepartments();
-  }, []);
+  }, [page]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -36,8 +42,9 @@ export default function DepartmentsPage() {
       setFormData({ name: '', description: '' });
       setEditingId(null);
       fetchDepartments();
+      toast.success(editingId ? 'Bölüm başarıyla güncellendi.' : 'Bölüm başarıyla eklendi.');
     } catch (error) {
-      alert('İşlem başarısız oldu.');
+      toast.error(`İşlem başarısız oldu:\n${error.message}`);
     }
   };
 
@@ -52,22 +59,23 @@ export default function DepartmentsPage() {
       try {
         await DepartmentService.delete(id);
         fetchDepartments();
+        toast.success('Bölüm başarıyla silindi.');
       } catch (error) {
-        alert('Silme işlemi başarısız. Bu bölüme bağlı doktorlar olabilir.');
+        toast.error('Silme işlemi başarısız. Bölüme kayıtlı doktorlar olabilir.');
       }
     }
   };
 
   const columns = [
-    { header: 'ID', accessor: 'id' },
-    { header: 'Bölüm Adı', accessor: 'name' },
-    { header: 'Açıklama', accessor: 'description' }
+    { header: t('id'), accessor: 'id' },
+    { header: t('dept_name'), render: (row) => t(row.name) },
+    { header: t('description'), render: (row) => t(row.description) }
   ];
 
   return (
     <div>
       <div className={styles.pageHeader}>
-        <h1 className={styles.pageTitle}>Hastane Bölümleri</h1>
+        <h1 className={styles.pageTitle}>{t('departments')}</h1>
         <button 
           className={styles.primaryBtn} 
           onClick={() => {
@@ -76,7 +84,7 @@ export default function DepartmentsPage() {
             setIsModalOpen(true);
           }}
         >
-          + Yeni Bölüm Ekle
+          + {t('add_dept')}
         </button>
       </div>
 
@@ -85,6 +93,9 @@ export default function DepartmentsPage() {
         data={departments} 
         onEdit={handleEdit} 
         onDelete={handleDelete} 
+        page={page}
+        totalPages={totalPages}
+        onPageChange={setPage}
       />
 
       <Modal 
@@ -110,8 +121,8 @@ export default function DepartmentsPage() {
             />
           </div>
           <div className={styles.formActions}>
-            <button type="button" className={styles.cancelBtn} onClick={() => setIsModalOpen(false)}>İptal</button>
-            <button type="submit" className={styles.primaryBtn}>Kaydet</button>
+            <button type="button" className={styles.cancelBtn} onClick={() => setIsModalOpen(false)}>{t('cancel')}</button>
+            <button type="submit" className={styles.primaryBtn}>{t('save')}</button>
           </div>
         </form>
       </Modal>

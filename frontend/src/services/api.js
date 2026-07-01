@@ -34,8 +34,8 @@ async function fetchAPI(endpoint, options = {}) {
         const errorData = await response.json();
         if (errorData.details) {
           // Validation error
-          const detailsStr = Object.values(errorData.details).join('\\n');
-          errorMessage = `${errorData.error}:\\n${detailsStr}`;
+          const detailsStr = Object.values(errorData.details).join('\n');
+          errorMessage = `${errorData.error}:\n${detailsStr}`;
         } else if (errorData.message) {
           errorMessage = errorData.message;
         }
@@ -54,14 +54,14 @@ async function fetchAPI(endpoint, options = {}) {
 
     return await response.json();
   } catch (error) {
-    console.error(`Fetch error on ${url}:`, error);
+    // console.error(`Fetch error on ${url}:`, error); // Removed to prevent Next.js overlay
     throw error;
   }
 }
 
 // ── BÖLÜM (DEPARTMENT) API ──
 export const DepartmentService = {
-  getAll: () => fetchAPI('/departments'),
+  getAll: (page = 0, size = 5) => fetchAPI(`/departments?page=${page}&size=${size}`),
   getById: (id) => fetchAPI(`/departments/${id}`),
   create: (data) => fetchAPI('/departments', { method: 'POST', body: JSON.stringify(data) }),
   update: (id, data) => fetchAPI(`/departments/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
@@ -70,7 +70,7 @@ export const DepartmentService = {
 
 // ── HASTA (PATIENT) API ──
 export const PatientService = {
-  getAll: () => fetchAPI('/patients'),
+  getAll: (page = 0, size = 5) => fetchAPI(`/patients?page=${page}&size=${size}`),
   getById: (id) => fetchAPI(`/patients/${id}`),
   create: (data) => fetchAPI('/patients', { method: 'POST', body: JSON.stringify(data) }),
   update: (id, data) => fetchAPI(`/patients/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
@@ -79,7 +79,7 @@ export const PatientService = {
 
 // ── DOKTOR (DOCTOR) API ──
 export const DoctorService = {
-  getAll: () => fetchAPI('/doctors'),
+  getAll: (page = 0, size = 5) => fetchAPI(`/doctors?page=${page}&size=${size}`),
   getById: (id) => fetchAPI(`/doctors/${id}`),
   create: (data) => fetchAPI('/doctors', { method: 'POST', body: JSON.stringify(data) }),
   update: (id, data) => fetchAPI(`/doctors/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
@@ -88,7 +88,7 @@ export const DoctorService = {
 
 // ── RANDEVU (APPOINTMENT) API ──
 export const AppointmentService = {
-  getAll: () => fetchAPI('/appointments'),
+  getAll: (page = 0, size = 5) => fetchAPI(`/appointments?page=${page}&size=${size}`),
   getById: (id) => fetchAPI(`/appointments/${id}`),
   create: (data) => fetchAPI('/appointments', { method: 'POST', body: JSON.stringify(data) }),
   update: (id, data) => fetchAPI(`/appointments/${id}`, { method: 'PUT', body: JSON.stringify(data) }),

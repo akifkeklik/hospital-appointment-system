@@ -1,8 +1,11 @@
+import { useSettings } from '../context/SettingsContext';
 import styles from './DataTable.module.css';
 
-export default function DataTable({ columns, data, onEdit, onDelete, actions }) {
+export default function DataTable({ columns, data, onEdit, onDelete, actions, page = 0, totalPages = 0, onPageChange }) {
+  const { t } = useSettings();
+
   if (!data || data.length === 0) {
-    return <div className={styles.emptyState}>Kayıt bulunamadı.</div>;
+    return <div className={styles.emptyState}>{t('no_data')}</div>;
   }
 
   return (
@@ -13,7 +16,7 @@ export default function DataTable({ columns, data, onEdit, onDelete, actions }) 
             {columns.map((col, idx) => (
               <th key={idx}>{col.header}</th>
             ))}
-            {(onEdit || onDelete || actions) && <th>İşlemler</th>}
+            {(onEdit || onDelete || actions) && <th>{t('actions')}</th>}
           </tr>
         </thead>
         <tbody>
@@ -29,12 +32,12 @@ export default function DataTable({ columns, data, onEdit, onDelete, actions }) 
                   {actions && actions(row)}
                   {onEdit && (
                     <button className={styles.editBtn} onClick={() => onEdit(row)}>
-                      Düzenle
+                      {t('edit')}
                     </button>
                   )}
                   {onDelete && (
                     <button className={styles.deleteBtn} onClick={() => onDelete(row.id)}>
-                      Sil
+                      {t('delete')}
                     </button>
                   )}
                 </td>
@@ -43,6 +46,26 @@ export default function DataTable({ columns, data, onEdit, onDelete, actions }) 
           ))}
         </tbody>
       </table>
+      
+      {totalPages > 1 && (
+        <div className={styles.pagination}>
+          <button 
+            className={styles.pageBtn} 
+            disabled={page === 0} 
+            onClick={() => onPageChange(page - 1)}
+          >
+            Önceki
+          </button>
+          <span className={styles.pageInfo}>Sayfa {page + 1} / {totalPages}</span>
+          <button 
+            className={styles.pageBtn} 
+            disabled={page >= totalPages - 1} 
+            onClick={() => onPageChange(page + 1)}
+          >
+            Sonraki
+          </button>
+        </div>
+      )}
     </div>
   );
 }

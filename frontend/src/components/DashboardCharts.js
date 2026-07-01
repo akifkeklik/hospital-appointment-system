@@ -4,17 +4,19 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as BarTooltip, Legend as BarLegend,
   ResponsiveContainer
 } from 'recharts';
+import { useSettings } from '../context/SettingsContext';
 import styles from './DashboardCharts.module.css';
 
 const COLORS = ['#2563eb', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316'];
 
 export default function DashboardCharts({ departments, doctors, appointments }) {
+  const { t } = useSettings();
   
   // 1. Veri Hazırlığı: Bölümlere Göre Doktor Sayısı
   const doctorDistribution = departments.map(dept => {
     // Bu bölüme ait doktorları say
     const count = doctors.filter(doc => doc.departmentId === dept.id).length;
-    return { name: dept.name, value: count };
+    return { name: t(dept.name), value: count };
   }).filter(item => item.value > 0); // Sadece doktoru olan bölümleri göster
 
   // 2. Veri Hazırlığı: Günlük Randevu Yoğunluğu
@@ -29,7 +31,7 @@ export default function DashboardCharts({ departments, doctors, appointments }) 
     .sort() // Tarihe göre sırala
     .map(date => ({
       date,
-      Randevu: appointmentsByDate[date]
+      [t('appointments')]: appointmentsByDate[date]
     }))
     .slice(-7); // Son 7 günü göster
 
@@ -37,11 +39,11 @@ export default function DashboardCharts({ departments, doctors, appointments }) 
     <div className={styles.chartsContainer}>
       
       <div className={styles.chartBox}>
-        <h3 className={styles.chartTitle}>Bölümlere Göre Doktor Dağılımı</h3>
+        <h3 className={styles.chartTitle}>{t('chart_dept_dist')}</h3>
         {doctorDistribution.length === 0 ? (
-          <p className={styles.noData}>Yeterli veri yok.</p>
+          <p className={styles.noData}>{t('no_data')}</p>
         ) : (
-          <ResponsiveContainer width="100%" height={300}>
+          <ResponsiveContainer width="100%" height={240}>
             <PieChart>
               <Pie
                 data={doctorDistribution}
@@ -64,11 +66,11 @@ export default function DashboardCharts({ departments, doctors, appointments }) 
       </div>
 
       <div className={styles.chartBox}>
-        <h3 className={styles.chartTitle}>Günlük Randevu Yoğunluğu (Son 7 Gün)</h3>
+        <h3 className={styles.chartTitle}>{t('chart_appt_density')}</h3>
         {appointmentData.length === 0 ? (
-          <p className={styles.noData}>Yeterli veri yok.</p>
+          <p className={styles.noData}>{t('no_data')}</p>
         ) : (
-          <ResponsiveContainer width="100%" height={300}>
+          <ResponsiveContainer width="100%" height={240}>
             <BarChart
               data={appointmentData}
               margin={{ top: 20, right: 30, left: 0, bottom: 5 }}
@@ -78,7 +80,7 @@ export default function DashboardCharts({ departments, doctors, appointments }) 
               <YAxis allowDecimals={false} />
               <BarTooltip />
               <BarLegend />
-              <Bar dataKey="Randevu" fill="#2563eb" radius={[4, 4, 0, 0]} />
+              <Bar dataKey={t('appointments')} fill="#2563eb" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         )}

@@ -3,9 +3,11 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { DepartmentService, PatientService, DoctorService, AppointmentService } from '../services/api';
 import DashboardCharts from '../components/DashboardCharts';
+import { useSettings } from '../context/SettingsContext';
 import styles from './page.module.css';
 
 export default function Dashboard() {
+  const { t } = useSettings();
   const [stats, setStats] = useState({
     departments: 0,
     patients: 0,
@@ -23,23 +25,23 @@ export default function Dashboard() {
     async function fetchStats() {
       try {
         const [depts, pats, docs, appts] = await Promise.all([
-          DepartmentService.getAll(),
-          PatientService.getAll(),
-          DoctorService.getAll(),
-          AppointmentService.getAll()
+          DepartmentService.getAll(0, 1000),
+          PatientService.getAll(0, 1000),
+          DoctorService.getAll(0, 1000),
+          AppointmentService.getAll(0, 1000)
         ]);
         
         setStats({
-          departments: depts.length,
-          patients: pats.length,
-          doctors: docs.length,
-          appointments: appts.length
+          departments: depts.totalElements || 0,
+          patients: pats.totalElements || 0,
+          doctors: docs.totalElements || 0,
+          appointments: appts.totalElements || 0
         });
 
         setChartData({
-          departments: depts,
-          doctors: docs,
-          appointments: appts
+          departments: depts.content || [],
+          doctors: docs.content || [],
+          appointments: appts.content || []
         });
       } catch (error) {
         console.error("Dashboard istatistikleri alınamadı", error);
@@ -53,17 +55,17 @@ export default function Dashboard() {
 
   return (
     <div>
-      <h1 className={styles.title}>Hoş Geldiniz, Sistem Özeti</h1>
-      <p className={styles.subtitle}>Hastane Randevu Sistemi yönetim paneline hoş geldiniz.</p>
+      <h1 className={styles.title}>{t('welcome')}</h1>
+      <p className={styles.subtitle}>{t('welcome_sub')}</p>
       
       {loading ? (
-        <p>Yükleniyor...</p>
+        <p>{t('loading')}</p>
       ) : (
         <div className={styles.grid}>
           <Link href="/departments" className={styles.card}>
             <div className={styles.cardIcon}>🏢</div>
             <div className={styles.cardInfo}>
-              <h3>Bölümler</h3>
+              <h3>{t('departments')}</h3>
               <p className={styles.count}>{stats.departments}</p>
             </div>
           </Link>
@@ -71,7 +73,7 @@ export default function Dashboard() {
           <Link href="/patients" className={styles.card}>
             <div className={styles.cardIcon}>🧑</div>
             <div className={styles.cardInfo}>
-              <h3>Kayıtlı Hastalar</h3>
+              <h3>{t('registered_patients')}</h3>
               <p className={styles.count}>{stats.patients}</p>
             </div>
           </Link>
@@ -79,7 +81,7 @@ export default function Dashboard() {
           <Link href="/doctors" className={styles.card}>
             <div className={styles.cardIcon}>👨‍⚕️</div>
             <div className={styles.cardInfo}>
-              <h3>Doktorlar</h3>
+              <h3>{t('doctors')}</h3>
               <p className={styles.count}>{stats.doctors}</p>
             </div>
           </Link>
@@ -87,7 +89,7 @@ export default function Dashboard() {
           <Link href="/appointments" className={styles.card}>
             <div className={styles.cardIcon}>📅</div>
             <div className={styles.cardInfo}>
-              <h3>Toplam Randevu</h3>
+              <h3>{t('total_appointments')}</h3>
               <p className={styles.count}>{stats.appointments}</p>
             </div>
           </Link>

@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 /**
  * ╔══════════════════════════════════════════════════════════════════╗
@@ -69,10 +71,9 @@ public class DoctorServiceImpl implements DoctorService {
     }
 
     @Override
-    public List<DoctorDto> getAllDoctors() {
-        return doctorRepository.findAll().stream()
-                .map(this::mapToDto)
-                .collect(Collectors.toList());
+    public Page<DoctorDto> getAllDoctors(Pageable pageable) {
+        Page<Doctor> doctors = doctorRepository.findAll(pageable);
+        return doctors.map(this::mapToDto);
     }
 
     @Override

@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 /**
  * ╔══════════════════════════════════════════════════════════════════╗
@@ -119,19 +121,9 @@ public class DepartmentServiceImpl implements DepartmentService {
     // 📌 READ (all) — Tüm Bölümleri Getir
     // ──────────────────────────────────────────────────────────
     @Override
-    public List<DepartmentDto> getAllDepartments() {
-
-        // findAll() → JpaRepository'den geliyor
-        // Veritabanındaki TÜM bölümleri döner
-        List<Department> departments = departmentRepository.findAll();
-
-        // Her Entity'yi DTO'ya dönüştür
-        // .stream() → Listeyi "akış" haline getirir (döngü gibi düşün)
-        // .map()    → Her elemanı dönüştür
-        // .collect()→ Sonuçları tekrar listeye topla
-        return departments.stream()
-                .map(this::mapToDto)
-                .collect(Collectors.toList());
+    public Page<DepartmentDto> getAllDepartments(Pageable pageable) {
+        Page<Department> departments = departmentRepository.findAll(pageable);
+        return departments.map(this::mapToDto);
     }
 
     // ──────────────────────────────────────────────────────────
