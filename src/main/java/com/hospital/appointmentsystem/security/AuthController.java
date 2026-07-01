@@ -37,6 +37,7 @@ public class AuthController {
     public record AuthRequest(String username, String password) {}
     public record AuthResponse(String token) {}
     public record RegisterRequest(String tcIdentityNumber, String firstName, String lastName, String email, String phoneNumber, String password) {}
+    public record ResetPasswordRequest(String tcIdentityNumber, String email, String newPassword) {}
     public record MessageResponse(String message) {}
 
     @PostMapping("/login")
@@ -82,5 +83,20 @@ public class AuthController {
                                  "ROLE_PATIENT", savedPatient.getId());
 
         return ResponseEntity.ok(new MessageResponse("Kullanıcı başarıyla kaydedildi."));
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
+        if (request.newPassword() == null || request.newPassword().length() < 6) {
+            return ResponseEntity.badRequest().body(new MessageResponse("Hata: Yeni şifreniz en az 6 karakter olmalıdır."));
+        }
+        
+        boolean success = userService.resetPassword(request.tcIdentityNumber(), request.email(), request.newPassword());
+        
+        if (success) {
+            return ResponseEntity.ok(new MessageResponse("Şifreniz başarıyla sıfırlandı. Yeni şifrenizle giriş yapabilirsiniz."));
+        } else {
+            return ResponseEntity.badRequest().body(new MessageResponse("Hata: Girdiğiniz TC Kimlik Numarası veya E-Posta adresi sistemimizle eşleşmiyor."));
+        }
     }
 }

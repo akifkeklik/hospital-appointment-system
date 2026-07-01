@@ -1,6 +1,7 @@
 .container {
   max-width: 1000px;
   margin: 0 auto;
+  transform: translate(-25px, -25px); /* Göz yanılsamasını düzeltmek için yukarı ve sola kaydırıldı */
 }
 
 .header {

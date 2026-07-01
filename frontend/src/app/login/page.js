@@ -137,7 +137,9 @@ export default function LoginPage() {
             </span>
             {loginType === 'PATIENT' && (
               <span style={{ color: 'var(--text-secondary)' }}>
-                Hesabınız yok mu? <a href="/register" style={{ color: 'var(--primary)', fontWeight: '600' }}>Kayıt Ol</a>
+                Şifrenizi mi unuttunuz? <a href="/forgot-password" style={{ color: 'var(--primary)', fontWeight: '600', marginRight: '15px' }}>Sıfırla</a>
+                |
+                Hesabınız yok mu? <a href="/register" style={{ color: 'var(--primary)', fontWeight: '600', marginLeft: '10px' }}>Kayıt Ol</a>
               </span>
             )}
           </div>
