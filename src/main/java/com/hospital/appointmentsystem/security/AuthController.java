@@ -126,13 +126,13 @@ public class AuthController {
             PatientDto patient = patientService.getPatientById(user.getReferenceId());
             return ResponseEntity.ok(new UserProfileDto(
                 user.getUsername(), user.getEmail(), user.getRole(),
-                patient.firstName(), patient.lastName(), patient.phoneNumber()
+                patient.getFirstName(), patient.getLastName(), patient.getPhoneNumber()
             ));
         } else if ("ROLE_DOCTOR".equals(user.getRole())) {
             DoctorDto doctor = doctorService.getDoctorById(user.getReferenceId());
             return ResponseEntity.ok(new UserProfileDto(
                 user.getUsername(), user.getEmail(), user.getRole(),
-                doctor.firstName(), doctor.lastName(), doctor.phoneNumber()
+                doctor.getFirstName(), doctor.getLastName(), doctor.getPhoneNumber()
             ));
         }
         
