@@ -17,10 +17,22 @@
   flex: 1;
 }
 
+.profileContainer {
+  position: relative;
+}
+
 .profile {
   display: flex;
   align-items: center;
   gap: 1rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 12px;
+  transition: background-color 0.2s ease;
+}
+
+.profile:hover {
+  background-color: var(--border);
 }
 
 .avatar {
@@ -86,3 +98,88 @@
   transform: translateY(-2px);
 }
 
+/* Dropdown Menu Styles */
+.dropdownMenu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 260px;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: 0 10px 40px -10px rgba(0,0,0,0.2);
+  z-index: 100;
+  animation: slideDown 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  overflow: hidden;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.dropdownHeader {
+  padding: 1.2rem;
+  background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.1), transparent);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+}
+
+.dropdownHeader strong {
+  color: var(--text-main);
+  font-size: 1.05rem;
+  margin-bottom: 0.2rem;
+}
+
+.dropdownHeader span {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+}
+
+.dropdownBody {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.dropdownItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+}
+
+.itemLabel {
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.itemValue {
+  color: var(--text-main);
+  font-weight: 600;
+}
+
+.dropdownFooter {
+  padding: 1rem;
+  border-top: 1px solid var(--border);
+  background-color: rgba(var(--background-rgb), 0.5);
+}
+
+.logoutBtn {
+  width: 100%;
+  padding: 0.8rem;
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.logoutBtn:hover {
+  background-color: #ef4444;
+  color: white;
+}

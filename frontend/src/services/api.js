@@ -126,4 +126,5 @@ export const AuthService = {
     method: 'POST',
     body: JSON.stringify({ tcIdentityNumber, email, newPassword })
   }),
+  getMe: () => fetchAPI('/auth/me'),
 };

@@ -1,17 +1,43 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { useSettings } from '../context/SettingsContext';
+import { AuthService } from '../services/api';
 import styles from './Header.module.css';
 
 export default function Header() {
+  const router = useRouter();
   const [theme, setTheme] = useState('light');
+  const [userProfile, setUserProfile] = useState(null);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
   const { t } = useSettings();
 
   useEffect(() => {
-    // Sayfa yüklendiğinde yerel depolamadaki temayı al
+    // Tema ayarını yükle
     const savedTheme = localStorage.getItem('theme') || 'light';
     setTheme(savedTheme);
     document.documentElement.setAttribute('data-theme', savedTheme);
+
+    // Profil bilgisini çek
+    const fetchProfile = async () => {
+      try {
+        const data = await AuthService.getMe();
+        setUserProfile(data);
+      } catch (error) {
+        console.error("Profil bilgisi alınamadı:", error);
+      }
+    };
+    fetchProfile();
+
+    // Dışarı tıklayınca dropdown kapansın
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const toggleTheme = () => {
@@ -20,6 +46,16 @@ export default function Header() {
     localStorage.setItem('theme', newTheme);
     document.documentElement.setAttribute('data-theme', newTheme);
   };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    router.push('/login');
+  };
+
+  const roleText = userProfile?.role === 'ROLE_PATIENT' ? 'Hasta' : 
+                   userProfile?.role === 'ROLE_DOCTOR' ? 'Doktor' : 'Yönetici';
+
+  const initial = userProfile?.firstName ? userProfile.firstName.charAt(0).toUpperCase() : 'U';
 
   return (
     <header className={styles.header}>
@@ -46,13 +82,44 @@ export default function Header() {
             </svg>
           )}
         </button>
-        <div className={styles.profile}>
-        <div className={styles.avatar}>A</div>
-        <div className={styles.info}>
-          <span className={styles.name}>{t('admin_name')}</span>
-          <span className={styles.role}>{t('admin_role')}</span>
+        
+        <div className={styles.profileContainer} ref={dropdownRef}>
+          <div className={styles.profile} onClick={() => setIsDropdownOpen(!isDropdownOpen)}>
+            <div className={styles.avatar}>{initial}</div>
+            <div className={styles.info}>
+              <span className={styles.name}>{userProfile ? `${userProfile.firstName} ${userProfile.lastName}` : 'Yükleniyor...'}</span>
+              <span className={styles.role}>{userProfile ? roleText : '...'}</span>
+            </div>
+          </div>
+
+          {isDropdownOpen && userProfile && (
+            <div className={styles.dropdownMenu}>
+              <div className={styles.dropdownHeader}>
+                <strong>{userProfile.firstName} {userProfile.lastName}</strong>
+                <span>{userProfile.email}</span>
+              </div>
+              <div className={styles.dropdownBody}>
+                <div className={styles.dropdownItem}>
+                  <span className={styles.itemLabel}>Rol:</span>
+                  <span className={styles.itemValue}>{roleText}</span>
+                </div>
+                <div className={styles.dropdownItem}>
+                  <span className={styles.itemLabel}>TC No:</span>
+                  <span className={styles.itemValue}>{userProfile.username}</span>
+                </div>
+                <div className={styles.dropdownItem}>
+                  <span className={styles.itemLabel}>Telefon:</span>
+                  <span className={styles.itemValue}>{userProfile.phoneNumber || '-'}</span>
+                </div>
+              </div>
+              <div className={styles.dropdownFooter}>
+                <button onClick={handleLogout} className={styles.logoutBtn}>
+                  Sistemden Çıkış Yap
+                </button>
+              </div>
+            </div>
+          )}
         </div>
-      </div>
       </div>
     </header>
   );

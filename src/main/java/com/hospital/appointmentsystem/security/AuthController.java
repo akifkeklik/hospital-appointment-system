@@ -11,6 +11,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
+import java.security.Principal;
+import com.hospital.appointmentsystem.doctor.api.DoctorService;
+import com.hospital.appointmentsystem.doctor.api.DoctorDto;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -21,16 +24,18 @@ public class AuthController {
     private final UserDetailsService userDetailsService;
     private final UserService userService;
     private final PatientService patientService;
+    private final DoctorService doctorService;
     private final UserRepository userRepository;
 
     public AuthController(AuthenticationManager authenticationManager, JwtUtil jwtUtil, 
                           UserDetailsService userDetailsService, UserService userService,
-                          PatientService patientService, UserRepository userRepository) {
+                          PatientService patientService, DoctorService doctorService, UserRepository userRepository) {
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
         this.userDetailsService = userDetailsService;
         this.userService = userService;
         this.patientService = patientService;
+        this.doctorService = doctorService;
         this.userRepository = userRepository;
     }
 
@@ -39,6 +44,7 @@ public class AuthController {
     public record RegisterRequest(String tcIdentityNumber, String firstName, String lastName, String email, String phoneNumber, String password) {}
     public record ResetPasswordRequest(String tcIdentityNumber, String email, String newPassword) {}
     public record MessageResponse(String message) {}
+    public record UserProfileDto(String username, String email, String role, String firstName, String lastName, String phoneNumber) {}
 
     @PostMapping("/login")
     public ResponseEntity<?> createAuthenticationToken(@RequestBody AuthRequest authRequest) {
@@ -105,5 +111,35 @@ public class AuthController {
     public ResponseEntity<?> forceDelete(@PathVariable String tc) {
         userRepository.findByUsername(tc).ifPresent(userRepository::delete);
         return ResponseEntity.ok(new MessageResponse(tc + " numaralı kayıt veritabanından tamamen silindi. Şimdi baştan kayıt olabilirsiniz!"));
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<?> getMe(Principal principal) {
+        if (principal == null) {
+            return ResponseEntity.status(401).body(new MessageResponse("Unauthorized"));
+        }
+        
+        User user = userRepository.findByUsername(principal.getName())
+                .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
+                
+        if ("ROLE_PATIENT".equals(user.getRole())) {
+            PatientDto patient = patientService.getPatientById(user.getReferenceId());
+            return ResponseEntity.ok(new UserProfileDto(
+                user.getUsername(), user.getEmail(), user.getRole(),
+                patient.firstName(), patient.lastName(), patient.phoneNumber()
+            ));
+        } else if ("ROLE_DOCTOR".equals(user.getRole())) {
+            DoctorDto doctor = doctorService.getDoctorById(user.getReferenceId());
+            return ResponseEntity.ok(new UserProfileDto(
+                user.getUsername(), user.getEmail(), user.getRole(),
+                doctor.firstName(), doctor.lastName(), doctor.phoneNumber()
+            ));
+        }
+        
+        // Admin veya diğer roller için
+        return ResponseEntity.ok(new UserProfileDto(
+            user.getUsername(), user.getEmail(), user.getRole(),
+            "Sistem", "Yöneticisi", ""
+        ));
     }
 }
