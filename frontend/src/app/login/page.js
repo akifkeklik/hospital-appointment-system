@@ -66,6 +66,10 @@ export default function LoginPage() {
           <button type="submit" className={styles.button} disabled={loading}>
             {loading ? 'Giriş Yapılıyor...' : 'Giriş Yap'}
           </button>
+
+          <div style={{ marginTop: '15px', textAlign: 'center', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+            Henüz hesabınız yok mu? <a href="/register" style={{ color: 'var(--primary)', fontWeight: '600' }}>Kayıt Ol</a>
+          </div>
         </form>
       </div>
     </div>

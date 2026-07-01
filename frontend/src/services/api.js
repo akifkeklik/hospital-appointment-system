@@ -118,4 +118,8 @@ export const AuthService = {
     method: 'POST', 
     body: JSON.stringify({ username, password }) 
   }),
+  register: (username, email, password) => fetchAPI('/auth/register', { 
+    method: 'POST', 
+    body: JSON.stringify({ username, email, password }) 
+  }),
 };

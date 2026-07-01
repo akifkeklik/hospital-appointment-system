@@ -9,7 +9,7 @@ import ToastContainer from '../components/Toast';
 export default function ClientLayout({ children }) {
   const pathname = usePathname();
   const router = useRouter();
-  const isLoginPage = pathname === '/login';
+  const isAuthPage = pathname === '/login' || pathname === '/register';
   const [mounted, setMounted] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
@@ -17,18 +17,18 @@ export default function ClientLayout({ children }) {
     setMounted(true);
     const token = localStorage.getItem('token');
     
-    if (!token && !isLoginPage) {
+    if (!token && !isAuthPage) {
       router.push('/login');
     } else if (token) {
       setIsAuthenticated(true);
     }
-  }, [pathname, isLoginPage, router]);
+  }, [pathname, isAuthPage, router]);
 
   // Next.js hydration uyumsuzluklarını önlemek için mount olana kadar boş dönebiliriz.
   if (!mounted) return null;
 
-  // Eğer sayfa login ise Sidebar ve Header'ı KESİNLİKLE GİZLE!
-  if (isLoginPage) {
+  // Eğer sayfa login veya register ise Sidebar ve Header'ı KESİNLİKLE GİZLE!
+  if (isAuthPage) {
     return (
       <SettingsProvider>
         {children}
@@ -38,7 +38,7 @@ export default function ClientLayout({ children }) {
   }
 
   // Token yoksa (henüz redirect olmadıysa) arayüzü çizme ki ekran saniyelik gözükmesin
-  if (!isAuthenticated && !isLoginPage) return null;
+  if (!isAuthenticated && !isAuthPage) return null;
 
   return (
     <SettingsProvider>
