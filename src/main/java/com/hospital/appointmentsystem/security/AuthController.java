@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
 import com.hospital.appointmentsystem.doctor.api.DoctorService;
 import com.hospital.appointmentsystem.doctor.api.DoctorDto;
+import com.hospital.appointmentsystem.doctor.impl.DoctorRegistrationRequest;
+import com.hospital.appointmentsystem.doctor.impl.DoctorRegistrationRequestRepository;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -26,10 +28,13 @@ public class AuthController {
     private final PatientService patientService;
     private final DoctorService doctorService;
     private final UserRepository userRepository;
+    private final DoctorRegistrationRequestRepository doctorRegistrationRequestRepository;
 
     public AuthController(AuthenticationManager authenticationManager, JwtUtil jwtUtil, 
                           UserDetailsService userDetailsService, UserService userService,
-                          PatientService patientService, DoctorService doctorService, UserRepository userRepository) {
+                          PatientService patientService, DoctorService doctorService, 
+                          UserRepository userRepository, 
+                          DoctorRegistrationRequestRepository doctorRegistrationRequestRepository) {
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
         this.userDetailsService = userDetailsService;
@@ -37,14 +42,16 @@ public class AuthController {
         this.patientService = patientService;
         this.doctorService = doctorService;
         this.userRepository = userRepository;
+        this.doctorRegistrationRequestRepository = doctorRegistrationRequestRepository;
     }
 
     public record AuthRequest(String username, String password) {}
     public record AuthResponse(String token) {}
     public record RegisterRequest(String tcIdentityNumber, String firstName, String lastName, String email, String phoneNumber, String password) {}
+    public record DoctorRegisterRequest(String tcIdentityNumber, String firstName, String lastName, String email, String phoneNumber, String password, Long departmentId, String specialization) {}
     public record ResetPasswordRequest(String tcIdentityNumber, String email, String newPassword) {}
     public record MessageResponse(String message) {}
-    public record UserProfileDto(String username, String email, String role, String firstName, String lastName, String phoneNumber) {}
+    public record UserProfileDto(Long id, String username, String email, String role, String firstName, String lastName, String phoneNumber) {}
 
     @PostMapping("/login")
     public ResponseEntity<?> createAuthenticationToken(@RequestBody AuthRequest authRequest) {
@@ -91,6 +98,33 @@ public class AuthController {
         return ResponseEntity.ok(new MessageResponse("Kullanıcı başarıyla kaydedildi."));
     }
 
+    @PostMapping("/doctor-register")
+    public ResponseEntity<?> registerDoctor(@RequestBody DoctorRegisterRequest request) {
+        if (userService.existsByUsername(request.tcIdentityNumber())) {
+            return ResponseEntity.badRequest().body(new MessageResponse("Hata: Bu TC Kimlik Numarası zaten kayıtlı."));
+        }
+        if (userService.existsByEmail(request.email())) {
+            return ResponseEntity.badRequest().body(new MessageResponse("Hata: Bu e-posta adresi zaten kullanılıyor."));
+        }
+        if (request.password() == null || request.password().length() < 6) {
+            return ResponseEntity.badRequest().body(new MessageResponse("Hata: Şifreniz en az 6 karakter olmalıdır."));
+        }
+
+        DoctorRegistrationRequest regRequest = new DoctorRegistrationRequest();
+        regRequest.setTcIdentityNumber(request.tcIdentityNumber());
+        regRequest.setFirstName(request.firstName());
+        regRequest.setLastName(request.lastName());
+        regRequest.setEmail(request.email());
+        regRequest.setPhoneNumber(request.phoneNumber());
+        regRequest.setDepartmentId(request.departmentId());
+        regRequest.setSpecialization(request.specialization());
+        regRequest.setPassword(request.password());
+        
+        doctorRegistrationRequestRepository.save(regRequest);
+
+        return ResponseEntity.ok(new MessageResponse("Kayıt isteğiniz alınmıştır. Yönetici onayından sonra giriş yapabileceksiniz."));
+    }
+
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
         if (request.newPassword() == null || request.newPassword().length() < 6) {
@@ -125,20 +159,20 @@ public class AuthController {
         if ("ROLE_PATIENT".equals(user.getRole())) {
             PatientDto patient = patientService.getPatientById(user.getReferenceId());
             return ResponseEntity.ok(new UserProfileDto(
-                user.getUsername(), user.getEmail(), user.getRole(),
+                patient.getId(), user.getUsername(), user.getEmail(), user.getRole(),
                 patient.getFirstName(), patient.getLastName(), patient.getPhoneNumber()
             ));
         } else if ("ROLE_DOCTOR".equals(user.getRole())) {
             DoctorDto doctor = doctorService.getDoctorById(user.getReferenceId());
             return ResponseEntity.ok(new UserProfileDto(
-                user.getUsername(), user.getEmail(), user.getRole(),
+                doctor.getId(), user.getUsername(), user.getEmail(), user.getRole(),
                 doctor.getFirstName(), doctor.getLastName(), doctor.getPhoneNumber()
             ));
         }
         
         // Admin veya diğer roller için
         return ResponseEntity.ok(new UserProfileDto(
-            user.getUsername(), user.getEmail(), user.getRole(),
+            user.getId(), user.getUsername(), user.getEmail(), user.getRole(),
             "Sistem", "Yöneticisi", ""
         ));
     }

@@ -103,6 +103,8 @@ export const DoctorService = {
 export const AppointmentService = {
   getAll: (page = 0, size = 5) => fetchAPI(`/appointments?page=${page}&size=${size}`),
   getById: (id) => fetchAPI(`/appointments/${id}`),
+  getByPatient: (patientId) => fetchAPI(`/appointments/patient/${patientId}`),
+  getByDoctor: (doctorId) => fetchAPI(`/appointments/doctor/${doctorId}`),
   create: (data) => fetchAPI('/appointments', { method: 'POST', body: JSON.stringify(data) }),
   update: (id, data) => fetchAPI(`/appointments/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   updateStatus: (id, status) => fetchAPI(`/appointments/${id}/status`, { 

@@ -60,6 +60,9 @@ public class Doctor {
     @Column(name = "specialization", nullable = false, length = 100)
     private String specialization;
 
+    @Column(name = "tc_identity_number", nullable = false, unique = true, length = 11)
+    private String tcIdentityNumber;
+
     @Column(name = "phone_number", length = 15)
     private String phoneNumber;
 
@@ -103,10 +106,11 @@ public class Doctor {
     public Doctor() {
     }
 
-    public Doctor(String firstName, String lastName, String specialization,
+    public Doctor(String firstName, String lastName, String tcIdentityNumber, String specialization,
                   String phoneNumber, String email, Department department) {
         this.firstName = firstName;
         this.lastName = lastName;
+        this.tcIdentityNumber = tcIdentityNumber;
         this.specialization = specialization;
         this.phoneNumber = phoneNumber;
         this.email = email;
@@ -137,6 +141,14 @@ public class Doctor {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public String getTcIdentityNumber() {
+        return tcIdentityNumber;
+    }
+
+    public void setTcIdentityNumber(String tcIdentityNumber) {
+        this.tcIdentityNumber = tcIdentityNumber;
     }
 
     public String getSpecialization() {

@@ -17,6 +17,7 @@ public class DoctorDto {
     private Long id;
     private String firstName;
     private String lastName;
+    private String tcIdentityNumber;
     private String specialization;
     private String phoneNumber;
     private String email;
@@ -52,6 +53,14 @@ public class DoctorDto {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public String getTcIdentityNumber() {
+        return tcIdentityNumber;
+    }
+
+    public void setTcIdentityNumber(String tcIdentityNumber) {
+        this.tcIdentityNumber = tcIdentityNumber;
     }
 
     public String getSpecialization() {

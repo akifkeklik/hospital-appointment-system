@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import java.time.LocalDate;
+import org.springframework.format.annotation.DateTimeFormat;
 
 /**
  * 🌐 Appointment Controller — Randevu REST API Endpoint'leri
@@ -85,6 +87,16 @@ public class AppointmentController {
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(responses);
+    }
+
+    // GET /api/appointments/available-slots — Belirli doktor ve tarih için müsait saatleri getir
+    @GetMapping("/available-slots")
+    public ResponseEntity<List<String>> getAvailableSlots(
+            @RequestParam Long doctorId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+
+        List<String> slots = appointmentService.getAvailableSlots(doctorId, date);
+        return ResponseEntity.ok(slots);
     }
 
     // PUT /api/appointments/{id} — Randevu güncelle

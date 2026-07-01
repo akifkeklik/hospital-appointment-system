@@ -52,10 +52,12 @@ export default function Header() {
     router.push('/login');
   };
 
-  const roleText = userProfile?.role === 'ROLE_PATIENT' ? 'Hasta' : 
-                   userProfile?.role === 'ROLE_DOCTOR' ? 'Doktor' : 'Yönetici';
+  const roleText = userProfile?.role === 'ROLE_PATIENT' ? t('patient') : 
+                   userProfile?.role === 'ROLE_DOCTOR' ? t('doctor') : t('admin_role');
 
-  const initial = userProfile?.firstName ? userProfile.firstName.charAt(0).toUpperCase() : 'U';
+  const initial = userProfile?.firstName && userProfile?.lastName 
+    ? `${userProfile.firstName.charAt(0)}${userProfile.lastName.charAt(0)}`.toUpperCase() 
+    : userProfile?.firstName ? userProfile.firstName.charAt(0).toUpperCase() : 'U';
 
   return (
     <header className={styles.header}>
@@ -100,21 +102,29 @@ export default function Header() {
               </div>
               <div className={styles.dropdownBody}>
                 <div className={styles.dropdownItem}>
-                  <span className={styles.itemLabel}>Rol:</span>
+                  <span className={styles.itemLabel}>{t('role') || 'Rol'}:</span>
                   <span className={styles.itemValue}>{roleText}</span>
                 </div>
                 <div className={styles.dropdownItem}>
-                  <span className={styles.itemLabel}>TC No:</span>
+                  <span className={styles.itemLabel}>{t('tc_no') || 'TC No'}:</span>
                   <span className={styles.itemValue}>{userProfile.username}</span>
                 </div>
                 <div className={styles.dropdownItem}>
-                  <span className={styles.itemLabel}>Telefon:</span>
+                  <span className={styles.itemLabel}>{t('phone') || 'Telefon'}:</span>
                   <span className={styles.itemValue}>{userProfile.phoneNumber || '-'}</span>
+                </div>
+                <div 
+                  className={styles.dropdownItem} 
+                  style={{ cursor: 'pointer', color: 'var(--primary)', marginTop: '0.5rem', fontWeight: '500' }}
+                  onClick={() => router.push('/settings')}
+                >
+                  <span className={styles.itemLabel}>⚙️</span>
+                  <span className={styles.itemValue}>{t('settings') || 'Ayarlar'}</span>
                 </div>
               </div>
               <div className={styles.dropdownFooter}>
                 <button onClick={handleLogout} className={styles.logoutBtn}>
-                  Sistemden Çıkış Yap
+                  {t('logout') || 'Sistemden Çıkış Yap'}
                 </button>
               </div>
             </div>

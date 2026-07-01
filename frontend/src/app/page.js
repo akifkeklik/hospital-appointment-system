@@ -3,8 +3,18 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { DepartmentService, PatientService, DoctorService, AppointmentService } from '../services/api';
 import DashboardCharts from '../components/DashboardCharts';
+import PatientDashboard from '../components/PatientDashboard';
+import DoctorDashboard from '../components/DoctorDashboard';
 import { useSettings } from '../context/SettingsContext';
 import styles from './page.module.css';
+
+function parseJwt(token) {
+  try {
+    return JSON.parse(atob(token.split('.')[1]));
+  } catch (e) {
+    return null;
+  }
+}
 
 export default function Dashboard() {
   const { t } = useSettings();
@@ -20,8 +30,22 @@ export default function Dashboard() {
     appointments: []
   });
   const [loading, setLoading] = useState(true);
+  const [role, setRole] = useState(null);
 
   useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      const decoded = parseJwt(token);
+      if (decoded && decoded.role) {
+        setRole(decoded.role);
+        if (decoded.role === 'ROLE_PATIENT' || decoded.role === 'ROLE_DOCTOR') {
+          // Hasta veya Doktor ise genel istatistik çekmeye gerek yok, kendi dashboard'ları var
+          setLoading(false);
+          return;
+        }
+      }
+    }
+
     async function fetchStats() {
       try {
         const [depts, pats, docs, appts] = await Promise.all([
@@ -53,8 +77,16 @@ export default function Dashboard() {
     fetchStats();
   }, []);
 
+  if (role === 'ROLE_PATIENT') {
+    return <PatientDashboard />;
+  }
+
+  if (role === 'ROLE_DOCTOR') {
+    return <DoctorDashboard />;
+  }
+
   return (
-    <div>
+    <div className={styles.dashboard}>
       <h1 className={styles.title}>{t('welcome')}</h1>
       <p className={styles.subtitle}>{t('welcome_sub')}</p>
       

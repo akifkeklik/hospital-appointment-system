@@ -1,7 +1,6 @@
 .container {
-  max-width: 1000px;
-  margin: 0 auto;
-  transform: translate(-25px, -25px); /* Göz yanılsamasını düzeltmek için yukarı ve sola kaydırıldı */
+  width: 100%;
+  height: 100%;
 }
 
 .header {
@@ -9,34 +8,32 @@
 }
 
 .title {
-  font-size: 1.25rem;
-  color: var(--secondary);
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-main);
   margin: 0;
 }
 
-.header {
-  margin-bottom: 1rem;
-}
-
 .settingsGrid {
-  display: grid;
-  gap: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
 .section {
   background-color: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 1rem;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
 }
 
 .sectionHeader {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  margin-bottom: 0.75rem;
-  padding-bottom: 0.5rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
   border-bottom: 1px solid var(--border);
 }
 
@@ -66,8 +63,8 @@
 /* Dil Butonları */
 .langGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-  gap: 0.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 0.75rem;
 }
 
 .langBtn {
@@ -82,6 +79,7 @@
   transition: all 0.2s;
   color: var(--text-main);
   position: relative;
+  height: 48px; /* Fixed height to prevent shift */
 }
 
 .langBtn:hover {
@@ -97,11 +95,15 @@
 
 .flag {
   font-size: 1.25rem;
+  flex-shrink: 0;
 }
 
 .langName {
   font-weight: 500;
   font-size: 0.875rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .checkIcon {
@@ -109,13 +111,14 @@
   height: 16px;
   color: var(--primary);
   margin-left: auto;
+  flex-shrink: 0;
 }
 
 /* Tema Butonları */
 .themeGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-  gap: 0.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 1.5rem 0.5rem;
 }
 
 .themeBtn {

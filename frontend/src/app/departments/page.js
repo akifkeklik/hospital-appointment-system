@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { DepartmentService } from '../../services/api';
 import DataTable from '../../components/DataTable';
 import Modal from '../../components/Modal';
+import ConfirmModal from '../../components/ConfirmModal';
 import { toast } from '../../components/Toast';
 import { useSettings } from '../../context/SettingsContext';
 import styles from '../shared.module.css';
@@ -15,6 +16,7 @@ export default function DepartmentsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({ name: '', description: '' });
   const [editingId, setEditingId] = useState(null);
+  const [confirmModal, setConfirmModal] = useState({ isOpen: false, id: null });
 
   const fetchDepartments = async () => {
     try {
@@ -54,15 +56,19 @@ export default function DepartmentsPage() {
     setIsModalOpen(true);
   };
 
-  const handleDelete = async (id) => {
-    if (confirm('Bu bölümü silmek istediğinize emin misiniz?')) {
-      try {
-        await DepartmentService.delete(id);
-        fetchDepartments();
-        toast.success('Bölüm başarıyla silindi.');
-      } catch (error) {
-        toast.error('Silme işlemi başarısız. Bölüme kayıtlı doktorlar olabilir.');
-      }
+  const handleDelete = (id) => {
+    setConfirmModal({ isOpen: true, id });
+  };
+
+  const executeDelete = async () => {
+    try {
+      await DepartmentService.delete(confirmModal.id);
+      fetchDepartments();
+      toast.success('Bölüm başarıyla silindi.');
+    } catch (error) {
+      toast.error('Silme işlemi başarısız. Bölüme kayıtlı doktorlar olabilir.');
+    } finally {
+      setConfirmModal({ isOpen: false, id: null });
     }
   };
 
@@ -126,6 +132,16 @@ export default function DepartmentsPage() {
           </div>
         </form>
       </Modal>
+
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        title="Silme İşlemi Onayı"
+        message="Bu bölümü silmek istediğinize emin misiniz?"
+        onConfirm={executeDelete}
+        onCancel={() => setConfirmModal({ isOpen: false, id: null })}
+        confirmText="Evet, Sil"
+        type="danger"
+      />
     </div>
   );
 }

@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { PatientService } from '../../services/api';
 import DataTable from '../../components/DataTable';
 import Modal from '../../components/Modal';
+import ConfirmModal from '../../components/ConfirmModal';
 import { toast } from '../../components/Toast';
 import { useSettings } from '../../context/SettingsContext';
 import styles from '../shared.module.css';
@@ -13,6 +14,7 @@ export default function PatientsPage() {
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [confirmModal, setConfirmModal] = useState({ isOpen: false, id: null });
   const [formData, setFormData] = useState({ 
     firstName: '', lastName: '', tcIdentityNumber: '', phoneNumber: '', email: '' 
   });
@@ -37,13 +39,14 @@ export default function PatientsPage() {
     try {
       if (editingId) {
         await PatientService.update(editingId, formData);
+        toast.success('Hasta başarıyla güncellendi.');
       } else {
         await PatientService.create(formData);
+        toast.success('Hasta başarıyla eklendi.');
       }
       setIsModalOpen(false);
       setEditingId(null);
       fetchPatients();
-      toast.success(editingId ? 'Hasta başarıyla güncellendi.' : 'Hasta başarıyla eklendi.');
     } catch (error) {
       toast.error(`İşlem başarısız oldu:\n${error.message}`);
     }
@@ -61,15 +64,19 @@ export default function PatientsPage() {
     setIsModalOpen(true);
   };
 
-  const handleDelete = async (id) => {
-    if (confirm('Bu hastayı silmek istediğinize emin misiniz?')) {
-      try {
-        await PatientService.delete(id);
-        fetchPatients();
-        toast.success('Hasta başarıyla silindi.');
-      } catch (error) {
-        toast.error('Silme işlemi başarısız. Hastanın randevuları olabilir.');
-      }
+  const handleDelete = (id) => {
+    setConfirmModal({ isOpen: true, id });
+  };
+
+  const executeDelete = async () => {
+    try {
+      await PatientService.delete(confirmModal.id);
+      fetchPatients();
+      toast.success('Hasta başarıyla silindi.');
+    } catch (error) {
+      toast.error('Silme işlemi başarısız. Hastanın randevuları olabilir.');
+    } finally {
+      setConfirmModal({ isOpen: false, id: null });
     }
   };
 
@@ -140,6 +147,16 @@ export default function PatientsPage() {
           </div>
         </form>
       </Modal>
+
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        title="Silme İşlemi Onayı"
+        message="Bu hastayı silmek istediğinize emin misiniz?"
+        onConfirm={executeDelete}
+        onCancel={() => setConfirmModal({ isOpen: false, id: null })}
+        confirmText="Evet, Sil"
+        type="danger"
+      />
     </div>
   );
 }

@@ -1,76 +1,133 @@
-# Hastane Randevu Sistemi (Hospital Appointment System) 🏥
+# Hospital Appointment System 🏥
 
-Bu proje, modern yazılım prensipleri (Domain-Driven Design - DDD) kullanılarak geliştirilmiş tam kapsamlı bir Hastane Randevu ve Yönetim Sistemidir.
+A comprehensive, multi-language Hospital Appointment and Management System developed using modern software principles (Domain-Driven Design - DDD).
 
-## 🚀 Yeni Özellikler (Premium Güncelleme)
+## 🚀 Key Features
 
-Proje, standart bir yönetim panelinden ziyade son kullanıcı deneyimini (UX) merkeze alan **"Premium"** bir web uygulamasına dönüştürülmüştür.
+This project goes beyond a standard dashboard by delivering a **"Premium"** web application standard focused deeply on user experience (UX).
 
-### 1. Modern Arayüz ve Tasarım (UI/UX)
-- **Glassmorphism (Cam Efekti):** Uygulama genelinde premium hissiyatı veren derinlikli gölgeler (shadows) ve yarı saydam yüzeyler kullanıldı.
-- **Koyu Tema (Dark Mode):** Uygulamanın varsayılan (default) teması, göz yormayan, son derece şık ve modern Gece Modu olarak ayarlandı.
-- **Dinamik Renk Temaları:** Sadece karanlık/aydınlık değil, tam 12 farklı vurgu rengi (İndigo, Gül, Zümrüt, Kehribar vb.) ile kullanıcıların sistemi kişiselleştirmesi sağlandı. Tüm seçimler tarayıcı hafızasında (`localStorage`) tutulur.
+### 1. Modern Interface & Design (UI/UX)
+- **Role-Based Dashboards:** Distinct, fluid, and tailor-made panels for Patients, Doctors, and Administrators.
+- **Glassmorphism:** Deep shadows and translucent surfaces that provide a premium feel across the entire application.
+- **Dynamic Color Themes:** 12 different accent colors (Indigo, Rose, Emerald, etc.) and sleek dark/light mode support. All selections are preserved in local storage.
+- **Responsive Layout:** An "App-Like" full-height layout specifically crafted for a seamless experience on all screens.
 
-### 2. Çoklu Dil Desteği (i18n)
-- Sistem tam **8 farklı dilde** (Türkçe, İngilizce, Almanca, Fransızca, İspanyolca, Rusça, Arapça ve Çince) çalışacak şekilde tasarlandı.
-- Gelişmiş dil yönetim sistemi (Context API tabanlı) sayesinde çeviriler, sayfa yenilenmeden anlık olarak değişir. Ekrana yansıyan tüm statik metinler (Hatta "Göz Polikliniği" gibi dinamik veriler bile) anlık çevrilir.
+### 2. Multi-Language Support (i18n)
+- The system operates flawlessly in **8 different languages** (Turkish, English, German, French, Spanish, Russian, Arabic, and Chinese).
+- Thanks to the advanced language management system, menus, tables, and info screens update instantly without reloading.
 
-### 3. Gelişmiş Güvenlik ve Kimlik Doğrulama (Spring Security & JWT)
-- **Güvenlik Duvarı:** Backend API uç noktaları dış dünyaya tamamen kapatılarak yetkisiz erişimler engellendi.
-- **JWT (JSON Web Token):** Kullanıcı girişleri token mimarisi üzerinden güvenli hale getirildi. 
-- **Veritabanı Destekli Kayıt (Registration):** Sistemi kullanmak isteyen yöneticiler için yepyeni bir Kayıt Ekranı geliştirildi. `User` Entity'si üzerinden veritabanına kayıt atılır.
-- **BCrypt Şifreleme:** Kullanıcı şifreleri veritabanına ASLA düz metin olarak kaydedilmez. BCrypt algoritması ile geri döndürülemez şekilde şifrelenir (Hash).
-- **Yönlendirme:** Geçersiz bir token ile işlem yapmaya çalışan kullanıcı, sistem tarafından saniyesinde güvenli `Login` ekranına yönlendirilir.
+### 3. Advanced Security & Authentication (Spring Security & JWT)
+- **JWT (JSON Web Token):** User logins and authorizations are strictly token-based.
+- **Role Management (ROLE_PATIENT, ROLE_DOCTOR, ROLE_ADMIN):** API endpoints are secured and access is granted based on specific roles.
+- **Smart Registration System (Doctor Requests):** Doctors wishing to join the system create a "Registration Request". Administrators can approve or reject these requests through a sleek UI.
+- **BCrypt Encryption:** User passwords are encrypted with an irreversible hash rather than plain text.
 
-### 4. Domain-Driven Design (DDD) Mimarisi
-- Backend; `api`, `impl` ve `web` paketlerine bölünerek, bileşenlerin birbirinden bağımsız, test edilebilir ve genişletilebilir olması sağlandı. 
-- Katı kurallı mimari yapı sayesinde (Örneğin `User` domain'inin ayrılması) projenin ilerleyen yıllarda bile kolayca yönetilebilmesi hedeflendi.
+### 4. Domain-Driven Design (DDD) Architecture
+- The backend is cleanly separated into `api`, `impl`, and `web` packages to maintain modularity.
+- This strict architectural pattern prevents spaghetti code and ensures long-term maintainability.
 
 ---
 
-## 🛠 Teknolojiler
+## 📁 Project Architecture & Folder Structure
+
+Here is a simplified overview of how the files and directories are organized for both the Frontend and Backend:
+
+```text
+HastaneRandevuSistm/
+├── src/                                  # Backend (Spring Boot Java) Root
+│   ├── main/java/com/hospital/appointmentsystem/
+│   │   ├── appointment/                  # Appointment Module
+│   │   │   ├── api/                      # DTOs, Requests, Responses
+│   │   │   ├── impl/                     # Entities, Repositories, Services
+│   │   │   └── web/                      # Controllers
+│   │   ├── auth/                         # Authentication & Roles
+│   │   ├── config/                       # Web & CORS Configurations
+│   │   ├── department/                   # Hospital Departments
+│   │   ├── doctor/                       # Doctor Profiles & Requests
+│   │   ├── patient/                      # Patient Profiles
+│   │   ├── security/                     # Spring Security & JWT Filters
+│   │   └── HospitalAppointmentApplication.java
+│   └── main/resources/
+│       └── application.properties        # Database & Server Settings
+├── frontend/                             # Frontend (Next.js & React) Root
+│   ├── public/                           # Static Assets
+│   ├── src/
+│   │   ├── app/                          # Next.js App Router (Pages)
+│   │   │   ├── login/, register/         # Auth Pages
+│   │   │   ├── patient-dashboard/        # Patient Views
+│   │   │   ├── doctor-dashboard/         # Doctor Views
+│   │   │   ├── admin-dashboard/          # Admin Views
+│   │   │   ├── settings/                 # Theme & Language Settings
+│   │   │   ├── ClientLayout.js           # Main Global Layout wrapper
+│   │   │   └── globals.css               # Global Styles & Theme Variables
+│   │   ├── components/                   # Reusable React Components
+│   │   │   ├── DoctorDashboard.js, .css  # Dashboard Component
+│   │   │   ├── PatientDashboard.js, .css # Dashboard Component
+│   │   │   ├── AdminDashboard.js         # Dashboard Component
+│   │   │   ├── Header.js, Sidebar.js     # Navigations
+│   │   │   ├── ConfirmModal.js           # Global Confirm UI
+│   │   │   └── EmptyState.js             # Global Empty State UI
+│   │   ├── context/
+│   │   │   └── SettingsContext.js        # Global Theme & Translation Provider
+│   │   ├── locales/
+│   │   │   └── index.js                  # 8 Languages Translations JSON
+│   │   └── services/
+│   │       └── api.js                    # Fetch Wrappers for Backend APIs
+│   ├── package.json                      # Node Dependencies
+│   └── next.config.js                    # Next.js Config
+├── pom.xml                               # Maven Dependencies
+└── README.md                             # Documentation
+```
+
+---
+
+## 🛠 Technologies Used
 
 ### Backend
 - **Java 17 & Spring Boot 3**
-- **Spring Security & JWT (io.jsonwebtoken)**
+- **Spring Security & JWT**
 - **Spring Data JPA & Hibernate**
-- **MySQL Veritabanı**
-- **Maven**
+- **MySQL Database**
+- **Maven** (Build Tool)
 
 ### Frontend
 - **Next.js (App Router) & React 18**
-- **Vanilla CSS (CSS Modules & CSS Variables)**
-- **Context API (State Yönetimi)**
+- **Vanilla CSS** (CSS Modules & Global CSS Variables)
+- **Context API** (For Theme and Language Management)
 
 ---
 
-## ⚙️ Kurulum ve Çalıştırma
+## ⚙️ Installation & Running Guide
 
-### 1. Veritabanı (MySQL)
-Uygulamayı çalıştırmadan önce yerel makinenizde MySQL sunucusunun çalıştığından emin olun. `application.properties` içerisinde:
+The application consists of two separate parts: Backend (Java) and Frontend (Next.js). You must start both sequentially.
+
+### 1. Database (MySQL) Setup
+Before running the application, ensure that your local MySQL server is active. Update your database credentials in `src/main/resources/application.properties` to match your system:
 ```properties
 spring.datasource.username=root
 spring.datasource.password=12345678
 ```
-gibi bilgilerinizi kendi sisteminize göre ayarlayın. Hibernate `users`, `doctors`, `patients` tablolarını otomatik oluşturacaktır.
+*Note: Once the project runs, tables (`users`, `doctors`, `patients`, etc.) will be automatically generated by Hibernate.*
 
-### 2. Backend'i Başlatmak
-Proje dizininde (HastaneRandevuSistm) komut satırını açıp şu komutu çalıştırın:
+### 2. Starting the Backend (via Terminal)
+Open a new command prompt (Terminal/PowerShell) in the main project directory (`HastaneRandevuSistm`) and run the following command using Apache Maven:
 ```bash
-mvnw clean spring-boot:run
+mvn clean spring-boot:run
 ```
-veya doğrudan IDE'niz üzerinden `HospitalAppointmentApplication.java` dosyasını çalıştırın.
+*(If the command fails, check your Maven Path settings or run `HospitalAppointmentApplication.java` directly from your IDE.)*
 
-### 3. Frontend'i Başlatmak
-Yeni bir komut satırında (frontend klasörünün içinde) şu komutları çalıştırın:
+When the server starts successfully, you will see a message like `Tomcat started on port(s): 8080`. Leave this terminal open.
+
+### 3. Starting the Frontend
+Now, open a **new** command prompt, navigate to the `frontend` folder, install the packages, and start the development server:
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
 
-### 4. Kullanım
-- Tarayıcıda `http://localhost:3000` adresine gidin.
-- Güvenlik duvarı sizi doğrudan **Login** ekranına yönlendirecektir.
-- İlk kez giriyorsanız alttaki "Kayıt Ol" butonuna basarak yeni bir yönetici hesabı oluşturun.
-- Ardından belirlediğiniz şifreyle sisteme giriş yaparak muhteşem arayüzün keyfini çıkarın! 🎉
+### 4. Usage Steps
+- Open your browser and navigate to `http://localhost:3000`.
+- The security mechanism will redirect you directly to the **Login** screen as no token will be found.
+- For the first use, go to the Admin tab, click "Are you an admin? Register", and create a root administrator account for the system.
+- Once logged in as an admin, click the "Settings (Gear ⚙️)" icon in the top right corner to switch between 12 different color themes and languages, and enjoy the premium design! 🎉

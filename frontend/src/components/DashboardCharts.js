@@ -43,14 +43,14 @@ export default function DashboardCharts({ departments, doctors, appointments }) 
         {doctorDistribution.length === 0 ? (
           <p className={styles.noData}>{t('no_data')}</p>
         ) : (
-          <ResponsiveContainer width="100%" height={240}>
+          <ResponsiveContainer width="100%" height={180}>
             <PieChart>
               <Pie
                 data={doctorDistribution}
                 cx="50%"
                 cy="50%"
                 labelLine={false}
-                outerRadius={100}
+                outerRadius={60}
                 fill="#8884d8"
                 dataKey="value"
                 label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
@@ -70,7 +70,7 @@ export default function DashboardCharts({ departments, doctors, appointments }) 
         {appointmentData.length === 0 ? (
           <p className={styles.noData}>{t('no_data')}</p>
         ) : (
-          <ResponsiveContainer width="100%" height={240}>
+          <ResponsiveContainer width="100%" height={180}>
             <BarChart
               data={appointmentData}
               margin={{ top: 20, right: 30, left: 0, bottom: 5 }}

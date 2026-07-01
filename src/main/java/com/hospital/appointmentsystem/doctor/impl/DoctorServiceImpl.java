@@ -4,6 +4,7 @@ import com.hospital.appointmentsystem.department.impl.Department;
 import com.hospital.appointmentsystem.department.impl.DepartmentRepository;
 import com.hospital.appointmentsystem.doctor.api.DoctorDto;
 import com.hospital.appointmentsystem.doctor.api.DoctorService;
+import com.hospital.appointmentsystem.user.api.UserService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -35,12 +36,15 @@ public class DoctorServiceImpl implements DoctorService {
     // ⭐ İKİ repository — çünkü iki tabloyla işimiz var
     private final DoctorRepository doctorRepository;
     private final DepartmentRepository departmentRepository;
+    private final UserService userService;
 
     // Constructor Injection — Spring ikisini de otomatik verir
     public DoctorServiceImpl(DoctorRepository doctorRepository,
-                             DepartmentRepository departmentRepository) {
+                             DepartmentRepository departmentRepository,
+                             UserService userService) {
         this.doctorRepository = doctorRepository;
         this.departmentRepository = departmentRepository;
+        this.userService = userService;
     }
 
     @Override
@@ -60,6 +64,13 @@ public class DoctorServiceImpl implements DoctorService {
         doctor.setDepartment(department); // ⭐ İlişkiyi kuruyoruz!
 
         Doctor savedDoctor = doctorRepository.save(doctor);
+
+        // ⭐ Doktor için otomatik Kullanıcı hesabı oluştur
+        // Şifre olarak TC'nin ilk 6 hanesini varsayılan olarak veriyoruz
+        String tc = doctorDto.getTcIdentityNumber();
+        String defaultPassword = tc != null && tc.length() >= 6 ? tc.substring(0, 6) : "123456";
+        userService.registerUser(tc, doctorDto.getEmail(), defaultPassword, "ROLE_DOCTOR", savedDoctor.getId());
+
         return mapToDto(savedDoctor);
     }
 
@@ -124,6 +135,7 @@ public class DoctorServiceImpl implements DoctorService {
         dto.setId(doctor.getId());
         dto.setFirstName(doctor.getFirstName());
         dto.setLastName(doctor.getLastName());
+        dto.setTcIdentityNumber(doctor.getTcIdentityNumber());
         dto.setSpecialization(doctor.getSpecialization());
         dto.setPhoneNumber(doctor.getPhoneNumber());
         dto.setEmail(doctor.getEmail());
@@ -141,6 +153,7 @@ public class DoctorServiceImpl implements DoctorService {
         Doctor doctor = new Doctor();
         doctor.setFirstName(dto.getFirstName());
         doctor.setLastName(dto.getLastName());
+        doctor.setTcIdentityNumber(dto.getTcIdentityNumber());
         doctor.setSpecialization(dto.getSpecialization());
         doctor.setPhoneNumber(dto.getPhoneNumber());
         doctor.setEmail(dto.getEmail());

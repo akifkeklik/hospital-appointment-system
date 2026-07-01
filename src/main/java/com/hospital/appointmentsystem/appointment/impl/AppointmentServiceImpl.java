@@ -8,7 +8,10 @@ import com.hospital.appointmentsystem.patient.impl.Patient;
 import com.hospital.appointmentsystem.patient.impl.PatientRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
@@ -62,6 +65,18 @@ public class AppointmentServiceImpl implements AppointmentService {
                         "Doktor bulunamadı! ID: " + appointmentDto.getDoctorId()
                 ));
 
+        // ⭐ Randevu saati uygunluk kontrolü
+        LocalDate date = appointmentDto.getAppointmentDate().toLocalDate();
+        LocalTime time = appointmentDto.getAppointmentDate().toLocalTime();
+        
+        List<String> availableSlots = getAvailableSlots(doctor.getId(), date);
+        
+        // saniyeleri atıp saat:dakika formatında kontrol et (örn: "09:15")
+        String timeString = String.format("%02d:%02d", time.getHour(), time.getMinute());
+        if (!availableSlots.contains(timeString)) {
+            throw new RuntimeException("Seçilen randevu saati dolu veya mesai saatleri dışında!");
+        }
+
         // 3. Randevu oluştur ve ilişkileri kur
         Appointment appointment = new Appointment();
         appointment.setPatient(patient);                          // ⭐ Hasta ilişkisi
@@ -105,6 +120,47 @@ public class AppointmentServiceImpl implements AppointmentService {
         return appointmentRepository.findByDoctorId(doctorId).stream()
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<String> getAvailableSlots(Long doctorId, LocalDate date) {
+        if (!doctorRepository.existsById(doctorId)) {
+            throw new RuntimeException("Doktor bulunamadı! ID: " + doctorId);
+        }
+
+        // Tüm günün randevularını çek
+        LocalDateTime startOfDay = date.atStartOfDay();
+        LocalDateTime endOfDay = date.atTime(LocalTime.MAX);
+        
+        List<Appointment> existingAppointments = appointmentRepository.findByDoctorId(doctorId).stream()
+            .filter(app -> app.getStatus() == AppointmentStatus.SCHEDULED)
+            .filter(app -> app.getAppointmentDate().isAfter(startOfDay) && app.getAppointmentDate().isBefore(endOfDay))
+            .collect(Collectors.toList());
+
+        // Dolu saatlerin listesi
+        List<LocalTime> bookedTimes = existingAppointments.stream()
+            .map(app -> app.getAppointmentDate().toLocalTime())
+            .collect(Collectors.toList());
+
+        List<String> availableSlots = new ArrayList<>();
+        LocalTime currentTime = LocalTime.of(9, 0); // Mesai başlangıcı
+        LocalTime endOfWork = LocalTime.of(17, 0); // Mesai bitişi
+
+        while (currentTime.isBefore(endOfWork)) {
+            // Öğle arası kontrolü (12:00 - 13:00)
+            if (!(currentTime.isAfter(LocalTime.of(11, 59)) && currentTime.isBefore(LocalTime.of(13, 0)))) {
+                // Eğer bu saatte randevu yoksa ve saat geçmişte değilse ekle
+                if (!bookedTimes.contains(currentTime)) {
+                    // Eğer bugün seçildiyse, geçmiş saatleri gösterme
+                    if (!(date.isEqual(LocalDate.now()) && currentTime.isBefore(LocalTime.now()))) {
+                        availableSlots.add(currentTime.toString());
+                    }
+                }
+            }
+            currentTime = currentTime.plusMinutes(15);
+        }
+
+        return availableSlots;
     }
 
     @Override
