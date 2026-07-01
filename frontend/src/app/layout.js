@@ -1,9 +1,6 @@
 import { Inter } from 'next/font/google';
 import './globals.css';
-import Sidebar from '../components/Sidebar';
-import Header from '../components/Header';
-import ToastContainer from '../components/Toast';
-import { SettingsProvider } from '../context/SettingsContext';
+import ClientLayout from './ClientLayout';
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -20,18 +17,9 @@ export default function RootLayout({ children }) {
   return (
     <html lang="tr" className={inter.variable}>
       <body className={inter.className}>
-        <SettingsProvider>
-          <div className="app-container">
-            <Sidebar />
-            <div className="main-content">
-              <Header />
-              <main className="page-content">
-                {children}
-              </main>
-            </div>
-          </div>
-          <ToastContainer />
-        </SettingsProvider>
+        <ClientLayout>
+          {children}
+        </ClientLayout>
       </body>
     </html>
   );
