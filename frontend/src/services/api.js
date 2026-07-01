@@ -16,6 +16,12 @@ async function fetchAPI(endpoint, options = {}) {
     'Accept': 'application/json'
   };
 
+  // JWT Token'ı localStorage'dan al ve varsa header'a ekle
+  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  if (token) {
+    defaultHeaders['Authorization'] = `Bearer ${token}`;
+  }
+
   const config = {
     ...options,
     headers: {
@@ -29,6 +35,13 @@ async function fetchAPI(endpoint, options = {}) {
 
     // Eğer başarılı değilse hata fırlat
     if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
+          localStorage.removeItem('token');
+          window.location.href = '/login';
+        }
+      }
+
       let errorMessage = response.statusText;
       try {
         const errorData = await response.json();
@@ -97,4 +110,12 @@ export const AppointmentService = {
     body: JSON.stringify({ status }) 
   }),
   delete: (id) => fetchAPI(`/appointments/${id}`, { method: 'DELETE' }),
+};
+
+// ── AUTHENTICATION API ──
+export const AuthService = {
+  login: (username, password) => fetchAPI('/auth/login', { 
+    method: 'POST', 
+    body: JSON.stringify({ username, password }) 
+  }),
 };
