@@ -62,6 +62,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/login", "/api/auth/register").permitAll()
                 .requestMatchers("/api/**").authenticated()
                 .anyRequest().permitAll()
+            )
             .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .exceptionHandling(exc -> exc
                 .authenticationEntryPoint((request, response, authException) -> {
