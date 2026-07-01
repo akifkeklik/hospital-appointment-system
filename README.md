@@ -1,71 +1,76 @@
-# 🏥 Hospital Appointment System
+# Hastane Randevu Sistemi (Hospital Appointment System) 🏥
 
-A modern, full-stack Hospital Appointment System built with a clean **Domain-Driven Design (DDD)** architecture. 
+Bu proje, modern yazılım prensipleri (Domain-Driven Design - DDD) kullanılarak geliştirilmiş tam kapsamlı bir Hastane Randevu ve Yönetim Sistemidir.
 
-This project demonstrates a fully functional REST API back-end and a responsive Next.js front-end, designed to manage hospital departments, doctors, patients, and their appointments seamlessly.
+## 🚀 Yeni Özellikler (Premium Güncelleme)
 
----
+Proje, standart bir yönetim panelinden ziyade son kullanıcı deneyimini (UX) merkeze alan **"Premium"** bir web uygulamasına dönüştürülmüştür.
 
-## ✨ Features
+### 1. Modern Arayüz ve Tasarım (UI/UX)
+- **Glassmorphism (Cam Efekti):** Uygulama genelinde premium hissiyatı veren derinlikli gölgeler (shadows) ve yarı saydam yüzeyler kullanıldı.
+- **Koyu Tema (Dark Mode):** Uygulamanın varsayılan (default) teması, göz yormayan, son derece şık ve modern Gece Modu olarak ayarlandı.
+- **Dinamik Renk Temaları:** Sadece karanlık/aydınlık değil, tam 12 farklı vurgu rengi (İndigo, Gül, Zümrüt, Kehribar vb.) ile kullanıcıların sistemi kişiselleştirmesi sağlandı. Tüm seçimler tarayıcı hafızasında (`localStorage`) tutulur.
 
-- **🏢 Department Management:** Add, update, and remove hospital departments.
-- **👨‍⚕️ Doctor Roster:** Register doctors and assign them to specific departments.
-- **🧑 Patient Records:** Securely store patient information (including National ID/TC and contact details).
-- **📅 Appointment Scheduling:** Book appointments between patients and doctors with real-time status tracking (Scheduled, Completed, Cancelled, No-Show).
-- **🔗 Cross-Origin Support:** Fully configured CORS allowing independent frontend/backend deployment.
+### 2. Çoklu Dil Desteği (i18n)
+- Sistem tam **8 farklı dilde** (Türkçe, İngilizce, Almanca, Fransızca, İspanyolca, Rusça, Arapça ve Çince) çalışacak şekilde tasarlandı.
+- Gelişmiş dil yönetim sistemi (Context API tabanlı) sayesinde çeviriler, sayfa yenilenmeden anlık olarak değişir. Ekrana yansıyan tüm statik metinler (Hatta "Göz Polikliniği" gibi dinamik veriler bile) anlık çevrilir.
 
----
+### 3. Gelişmiş Güvenlik ve Kimlik Doğrulama (Spring Security & JWT)
+- **Güvenlik Duvarı:** Backend API uç noktaları dış dünyaya tamamen kapatılarak yetkisiz erişimler engellendi.
+- **JWT (JSON Web Token):** Kullanıcı girişleri token mimarisi üzerinden güvenli hale getirildi. 
+- **Veritabanı Destekli Kayıt (Registration):** Sistemi kullanmak isteyen yöneticiler için yepyeni bir Kayıt Ekranı geliştirildi. `User` Entity'si üzerinden veritabanına kayıt atılır.
+- **BCrypt Şifreleme:** Kullanıcı şifreleri veritabanına ASLA düz metin olarak kaydedilmez. BCrypt algoritması ile geri döndürülemez şekilde şifrelenir (Hash).
+- **Yönlendirme:** Geçersiz bir token ile işlem yapmaya çalışan kullanıcı, sistem tarafından saniyesinde güvenli `Login` ekranına yönlendirilir.
 
-## 🛠️ Tech Stack
-
-**Backend:**
-- **Java 17+**
-- **Spring Boot 3** (Web, Data JPA)
-- **MySQL 8** (Database)
-- **Maven** (Dependency Management)
-
-**Frontend:**
-- **Next.js 14+** (App Router)
-- **React.js**
-- **Vanilla CSS Modules** (Custom modern hospital-themed UI)
+### 4. Domain-Driven Design (DDD) Mimarisi
+- Backend; `api`, `impl` ve `web` paketlerine bölünerek, bileşenlerin birbirinden bağımsız, test edilebilir ve genişletilebilir olması sağlandı. 
+- Katı kurallı mimari yapı sayesinde (Örneğin `User` domain'inin ayrılması) projenin ilerleyen yıllarda bile kolayca yönetilebilmesi hedeflendi.
 
 ---
 
-## 🚀 How to Run Locally
+## 🛠 Teknolojiler
 
-### 1. Database Setup (MySQL)
-Create a new database in MySQL named `hospitaldb`:
-```sql
-CREATE DATABASE hospitaldb;
+### Backend
+- **Java 17 & Spring Boot 3**
+- **Spring Security & JWT (io.jsonwebtoken)**
+- **Spring Data JPA & Hibernate**
+- **MySQL Veritabanı**
+- **Maven**
+
+### Frontend
+- **Next.js (App Router) & React 18**
+- **Vanilla CSS (CSS Modules & CSS Variables)**
+- **Context API (State Yönetimi)**
+
+---
+
+## ⚙️ Kurulum ve Çalıştırma
+
+### 1. Veritabanı (MySQL)
+Uygulamayı çalıştırmadan önce yerel makinenizde MySQL sunucusunun çalıştığından emin olun. `application.properties` içerisinde:
+```properties
+spring.datasource.username=root
+spring.datasource.password=12345678
 ```
-*(Ensure your MySQL credentials match `application.properties` - default is root / 12345678).*
+gibi bilgilerinizi kendi sisteminize göre ayarlayın. Hibernate `users`, `doctors`, `patients` tablolarını otomatik oluşturacaktır.
 
-### 2. Run the Backend (Spring Boot)
-Navigate to the root folder and run the Maven wrapper:
+### 2. Backend'i Başlatmak
+Proje dizininde (HastaneRandevuSistm) komut satırını açıp şu komutu çalıştırın:
 ```bash
-mvn clean spring-boot:run
+mvnw clean spring-boot:run
 ```
-The API will be available at `http://localhost:8080`. (Database tables will be created automatically).
+veya doğrudan IDE'niz üzerinden `HospitalAppointmentApplication.java` dosyasını çalıştırın.
 
-### 3. Run the Frontend (Next.js)
-Open a new terminal, navigate to the `frontend` folder, install dependencies, and start the development server:
+### 3. Frontend'i Başlatmak
+Yeni bir komut satırında (frontend klasörünün içinde) şu komutları çalıştırın:
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
-The web application will be available at `http://localhost:3000`.
 
----
-
-## 🏗️ Architecture (DDD-Lite)
-
-The backend is structured using a Domain-Driven Design (DDD) approach to ensure clean code and separation of concerns. Each domain is self-contained:
-- `api/` (DTOs, Requests, Responses)
-- `impl/` (Entities, Repositories, Services)
-- `web/` (REST Controllers)
-
-Current Domains: `Department`, `Patient`, `Doctor`, `Appointment`.
-
----
-*Developed for educational purposes to demonstrate clean architecture and modern full-stack development.*
+### 4. Kullanım
+- Tarayıcıda `http://localhost:3000` adresine gidin.
+- Güvenlik duvarı sizi doğrudan **Login** ekranına yönlendirecektir.
+- İlk kez giriyorsanız alttaki "Kayıt Ol" butonuna basarak yeni bir yönetici hesabı oluşturun.
+- Ardından belirlediğiniz şifreyle sisteme giriş yaparak muhteşem arayüzün keyfini çıkarın! 🎉
