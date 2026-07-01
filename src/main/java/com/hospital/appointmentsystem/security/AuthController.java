@@ -99,4 +99,11 @@ public class AuthController {
             return ResponseEntity.badRequest().body(new MessageResponse("Hata: Girdiğiniz TC Kimlik Numarası veya E-Posta adresi sistemimizle eşleşmiyor."));
         }
     }
+
+    // GEÇİCİ: Geliştirme aşamasında kilitli kalan TC'leri silmek için
+    @GetMapping("/force-delete/{tc}")
+    public ResponseEntity<?> forceDelete(@PathVariable String tc) {
+        userRepository.findByUsername(tc).ifPresent(userRepository::delete);
+        return ResponseEntity.ok(new MessageResponse(tc + " numaralı kayıt veritabanından tamamen silindi. Şimdi baştan kayıt olabilirsiniz!"));
+    }
 }
