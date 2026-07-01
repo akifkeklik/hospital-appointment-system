@@ -7,12 +7,26 @@ import styles from '../login/page.module.css';
 
 export default function RegisterPage() {
   const router = useRouter();
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  
+  const [formData, setFormData] = useState({
+    tcIdentityNumber: '',
+    firstName: '',
+    lastName: '',
+    email: '',
+    phoneNumber: '',
+    password: ''
+  });
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -21,7 +35,7 @@ export default function RegisterPage() {
     setSuccess(false);
 
     try {
-      await AuthService.register(username, email, password);
+      await AuthService.register(formData);
       setSuccess(true);
       setTimeout(() => {
         router.push('/login');
@@ -35,10 +49,10 @@ export default function RegisterPage() {
 
   return (
     <div className={styles.container}>
-      <div className={styles.loginCard}>
+      <div className={styles.loginCard} style={{ maxWidth: '450px' }}>
         <div className={styles.logo}>HRS</div>
-        <h1 className={styles.title}>Hesap Oluştur</h1>
-        <p className={styles.subtitle}>Sisteme erişmek için yeni bir yönetici hesabı oluşturun.</p>
+        <h1 className={styles.title}>Hasta Kayıt</h1>
+        <p className={styles.subtitle}>Randevu almak için hasta hesabınızı oluşturun.</p>
 
         {error && <div className={styles.error}>{error}</div>}
         {success && (
@@ -49,39 +63,86 @@ export default function RegisterPage() {
 
         <form className={styles.form} onSubmit={handleRegister}>
           <div className={styles.inputGroup}>
-            <label className={styles.label}>Kullanıcı Adı</label>
+            <label className={styles.label}>TC Kimlik Numarası</label>
             <input
               type="text"
+              name="tcIdentityNumber"
               className={styles.input}
-              placeholder="Kullanıcı adınızı belirleyin"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              placeholder="11 haneli TC kimlik no"
+              value={formData.tcIdentityNumber}
+              onChange={handleChange}
+              maxLength={11}
               required
             />
           </div>
+          
+          <div style={{ display: 'flex', gap: '10px' }}>
+            <div className={styles.inputGroup} style={{ flex: 1 }}>
+              <label className={styles.label}>Ad</label>
+              <input
+                type="text"
+                name="firstName"
+                className={styles.input}
+                placeholder="Adınız"
+                value={formData.firstName}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div className={styles.inputGroup} style={{ flex: 1 }}>
+              <label className={styles.label}>Soyad</label>
+              <input
+                type="text"
+                name="lastName"
+                className={styles.input}
+                placeholder="Soyadınız"
+                value={formData.lastName}
+                onChange={handleChange}
+                required
+              />
+            </div>
+          </div>
+
           <div className={styles.inputGroup}>
             <label className={styles.label}>E-Posta</label>
             <input
               type="email"
+              name="email"
               className={styles.input}
               placeholder="Mail adresiniz"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={formData.email}
+              onChange={handleChange}
               required
             />
           </div>
+
+          <div className={styles.inputGroup}>
+            <label className={styles.label}>Telefon Numarası</label>
+            <input
+              type="tel"
+              name="phoneNumber"
+              className={styles.input}
+              placeholder="0555 555 5555"
+              value={formData.phoneNumber}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
           <div className={styles.inputGroup}>
             <label className={styles.label}>Şifre</label>
             <input
               type="password"
+              name="password"
               className={styles.input}
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              placeholder="En az 6 karakter"
+              value={formData.password}
+              onChange={handleChange}
               required
               minLength={6}
             />
           </div>
+
           <button type="submit" className={styles.button} disabled={loading || success}>
             {loading ? 'Kaydediliyor...' : 'Kayıt Ol'}
           </button>

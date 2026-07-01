@@ -26,12 +26,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void registerUser(String username, String email, String password) {
+    public void registerUser(String username, String email, String password, String role, Long referenceId) {
         User newUser = new User(
                 username,
                 email,
                 passwordEncoder.encode(password),
-                "ADMIN" // Şimdilik tüm kayıt olanlar ADMIN rolüne sahip.
+                role,
+                referenceId
         );
         userRepository.save(newUser);
     }
