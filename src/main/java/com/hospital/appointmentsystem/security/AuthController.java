@@ -53,6 +53,9 @@ public class AuthController {
         if (userService.existsByEmail(registerRequest.email())) {
             return ResponseEntity.badRequest().body("Hata: Bu e-posta adresi zaten kullanılıyor.");
         }
+        if (registerRequest.password() == null || registerRequest.password().length() < 6) {
+            return ResponseEntity.badRequest().body("Hata: Şifreniz en az 6 karakter olmalıdır.");
+        }
 
         userService.registerUser(registerRequest.username(), registerRequest.email(), registerRequest.password());
 

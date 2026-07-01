@@ -37,8 +37,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             jwt = authHeader.substring(7);
             try {
                 username = jwtUtil.extractUsername(jwt);
+            } catch (io.jsonwebtoken.ExpiredJwtException e) {
+                logger.warn("JWT Token süresi dolmuş: " + e.getMessage());
+            } catch (io.jsonwebtoken.security.SignatureException e) {
+                logger.warn("JWT Token imzası geçersiz: " + e.getMessage());
             } catch (Exception e) {
-                System.out.println("Invalid JWT Token: " + e.getMessage());
+                logger.warn("Geçersiz JWT Token: " + e.getMessage());
             }
         }
 
