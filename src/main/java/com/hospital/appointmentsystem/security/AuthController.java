@@ -1,5 +1,6 @@
 package com.hospital.appointmentsystem.security;
 
+import com.hospital.appointmentsystem.user.api.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -14,17 +15,14 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
     private final UserDetailsService userDetailsService;
-    private final UserRepository userRepository;
-    private final org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
+    private final UserService userService;
 
     public AuthController(AuthenticationManager authenticationManager, JwtUtil jwtUtil, 
-                          UserDetailsService userDetailsService, UserRepository userRepository,
-                          org.springframework.security.crypto.password.PasswordEncoder passwordEncoder) {
+                          UserDetailsService userDetailsService, UserService userService) {
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
         this.userDetailsService = userDetailsService;
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
+        this.userService = userService;
     }
 
     public record AuthRequest(String username, String password) {}
@@ -49,21 +47,15 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody RegisterRequest registerRequest) {
-        if (userRepository.findByUsername(registerRequest.username()).isPresent()) {
+        if (userService.existsByUsername(registerRequest.username())) {
             return ResponseEntity.badRequest().body("Hata: Bu kullanıcı adı zaten alınmış.");
         }
-        if (userRepository.findByEmail(registerRequest.email()).isPresent()) {
+        if (userService.existsByEmail(registerRequest.email())) {
             return ResponseEntity.badRequest().body("Hata: Bu e-posta adresi zaten kullanılıyor.");
         }
 
-        User newUser = new User(
-                registerRequest.username(),
-                registerRequest.email(),
-                passwordEncoder.encode(registerRequest.password()),
-                "ADMIN" // Şimdilik tüm kayıt olanlar ADMIN rolüne sahip.
-        );
+        userService.registerUser(registerRequest.username(), registerRequest.email(), registerRequest.password());
 
-        userRepository.save(newUser);
         return ResponseEntity.ok("Kullanıcı başarıyla kaydedildi.");
     }
 }

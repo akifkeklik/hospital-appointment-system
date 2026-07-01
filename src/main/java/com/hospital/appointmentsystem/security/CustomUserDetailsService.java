@@ -1,5 +1,7 @@
 package com.hospital.appointmentsystem.security;
 
+import com.hospital.appointmentsystem.user.impl.User;
+import com.hospital.appointmentsystem.user.impl.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

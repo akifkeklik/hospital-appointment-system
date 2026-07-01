@@ -1,4 +1,4 @@
-package com.hospital.appointmentsystem.security;
+package com.hospital.appointmentsystem.user.impl;
 
 import jakarta.persistence.*;
 
