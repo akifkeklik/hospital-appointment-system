@@ -133,3 +133,12 @@ export const AuthService = {
   }),
   getMe: () => fetchAPI('/auth/me'),
 };
+
+// ── SYSTEM SETTINGS API ──
+export const SystemSettingService = {
+  getSettings: () => fetchAPI('/admin/settings'),
+  updateSettings: (data) => fetchAPI('/admin/settings', {
+    method: 'PUT',
+    body: JSON.stringify(data)
+  })
+};

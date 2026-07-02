@@ -2,13 +2,14 @@
 import { useSettings } from '../../context/SettingsContext';
 import styles from './page.module.css';
 import { useEffect, useState } from 'react';
-import { AuthService } from '../../services/api';
+import { AuthService, SystemSettingService } from '../../services/api';
 
 export default function SettingsPage() {
   const { language, changeLanguage, themeColor, applyThemeColor, t, THEMES, LANGUAGES } = useSettings();
+  const [mounted, setMounted] = useState(false);
   const [userProfile, setUserProfile] = useState(null);
   
-  // Dummy System Settings State
+  // Real System Settings State
   const [apptDuration, setApptDuration] = useState('15');
   const [startTime, setStartTime] = useState('09:00');
   const [endTime, setEndTime] = useState('17:00');
@@ -18,11 +19,30 @@ export default function SettingsPage() {
     setMounted(true);
     AuthService.getMe().then(data => {
       setUserProfile(data);
+      if (data && data.role === 'ROLE_ADMIN') {
+        SystemSettingService.getSettings().then(settings => {
+          setApptDuration(settings.appointmentDuration.toString());
+          setStartTime(settings.workStartTime);
+          setEndTime(settings.workEndTime);
+          setMaintenanceMode(settings.maintenanceMode);
+        }).catch(err => console.error("Error fetching settings:", err));
+      }
     }).catch(() => {});
   }, []);
 
-  const handleSaveSystemSettings = () => {
-    alert("Sistem ayarları başarıyla güncellendi! (Demo)");
+  const handleSaveSystemSettings = async () => {
+    try {
+      await SystemSettingService.updateSettings({
+        appointmentDuration: parseInt(apptDuration),
+        workStartTime: startTime,
+        workEndTime: endTime,
+        maintenanceMode: maintenanceMode
+      });
+      alert("Sistem ayarları başarıyla güncellendi!");
+    } catch (err) {
+      alert("Ayarlar güncellenirken bir hata oluştu.");
+      console.error(err);
+    }
   };
 
   if (!mounted) return null;
