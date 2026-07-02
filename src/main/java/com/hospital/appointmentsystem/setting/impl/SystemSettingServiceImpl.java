@@ -18,7 +18,7 @@ public class SystemSettingServiceImpl implements SystemSettingService {
     @Transactional
     public SystemSettingDto getSettings() {
         SystemSetting setting = repository.findById(1L).orElseGet(() -> {
-            SystemSetting defaultSetting = new SystemSetting(15, "09:00", "17:00", false);
+            SystemSetting defaultSetting = new SystemSetting(15, "09:00", "17:00", "12:00", "13:00", false);
             return repository.save(defaultSetting);
         });
         return mapToDto(setting);
@@ -32,6 +32,8 @@ public class SystemSettingServiceImpl implements SystemSettingService {
         setting.setAppointmentDuration(dto.getAppointmentDuration());
         setting.setWorkStartTime(dto.getWorkStartTime());
         setting.setWorkEndTime(dto.getWorkEndTime());
+        setting.setLunchBreakStart(dto.getLunchBreakStart());
+        setting.setLunchBreakEnd(dto.getLunchBreakEnd());
         setting.setMaintenanceMode(dto.getMaintenanceMode());
 
         setting = repository.save(setting);
@@ -43,6 +45,8 @@ public class SystemSettingServiceImpl implements SystemSettingService {
                 setting.getAppointmentDuration(),
                 setting.getWorkStartTime(),
                 setting.getWorkEndTime(),
+                setting.getLunchBreakStart(),
+                setting.getLunchBreakEnd(),
                 setting.getMaintenanceMode()
         );
     }

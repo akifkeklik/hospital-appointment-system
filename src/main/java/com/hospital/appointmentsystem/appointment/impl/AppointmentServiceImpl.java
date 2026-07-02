@@ -16,6 +16,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import com.hospital.appointmentsystem.setting.api.SystemSettingService;
+import com.hospital.appointmentsystem.setting.api.SystemSettingDto;
+import com.hospital.appointmentsystem.doctorleave.impl.DoctorLeaveRepository;
 
 /**
  * ╔══════════════════════════════════════════════════════════════════╗
@@ -40,14 +43,20 @@ public class AppointmentServiceImpl implements AppointmentService {
     private final AppointmentRepository appointmentRepository;
     private final PatientRepository patientRepository;
     private final DoctorRepository doctorRepository;
+    private final SystemSettingService systemSettingService;
+    private final DoctorLeaveRepository doctorLeaveRepository;
 
-    // ⭐ ÜÇ repository enjeksiyonu
+    // ⭐ BEŞ repository/service enjeksiyonu
     public AppointmentServiceImpl(AppointmentRepository appointmentRepository,
                                   PatientRepository patientRepository,
-                                  DoctorRepository doctorRepository) {
+                                  DoctorRepository doctorRepository,
+                                  SystemSettingService systemSettingService,
+                                  DoctorLeaveRepository doctorLeaveRepository) {
         this.appointmentRepository = appointmentRepository;
         this.patientRepository = patientRepository;
         this.doctorRepository = doctorRepository;
+        this.systemSettingService = systemSettingService;
+        this.doctorLeaveRepository = doctorLeaveRepository;
     }
 
     @Override
@@ -128,6 +137,19 @@ public class AppointmentServiceImpl implements AppointmentService {
             throw new RuntimeException("Doktor bulunamadı! ID: " + doctorId);
         }
 
+        // DOKTOR İZİN KONTROLÜ (Enterprise Feature)
+        if (doctorLeaveRepository.isDoctorOnLeave(doctorId, date)) {
+            return new ArrayList<>(); // Doktor izinliyse slot yok!
+        }
+
+        // SİSTEM AYARLARINI ÇEK
+        SystemSettingDto settings = systemSettingService.getSettings();
+        LocalTime workStart = LocalTime.parse(settings.getWorkStartTime());
+        LocalTime workEnd = LocalTime.parse(settings.getWorkEndTime());
+        LocalTime lunchStart = LocalTime.parse(settings.getLunchBreakStart());
+        LocalTime lunchEnd = LocalTime.parse(settings.getLunchBreakEnd());
+        int duration = settings.getAppointmentDuration();
+
         // Tüm günün randevularını çek
         LocalDateTime startOfDay = date.atStartOfDay();
         LocalDateTime endOfDay = date.atTime(LocalTime.MAX);
@@ -143,12 +165,16 @@ public class AppointmentServiceImpl implements AppointmentService {
             .collect(Collectors.toList());
 
         List<String> availableSlots = new ArrayList<>();
-        LocalTime currentTime = LocalTime.of(9, 0); // Mesai başlangıcı
-        LocalTime endOfWork = LocalTime.of(17, 0); // Mesai bitişi
+        LocalTime currentTime = workStart;
 
-        while (currentTime.isBefore(endOfWork)) {
-            // Öğle arası kontrolü (12:00 - 13:00)
-            if (!(currentTime.isAfter(LocalTime.of(11, 59)) && currentTime.isBefore(LocalTime.of(13, 0)))) {
+        while (currentTime.plusMinutes(duration).compareTo(workEnd) <= 0) {
+            LocalTime slotEnd = currentTime.plusMinutes(duration);
+            
+            // Öğle arası kontrolü (Eğer mevcut slot tamamen öğle arası içindeyse veya taşıyorsa)
+            // Kural: Slot'un başlangıcı lunchEnd'den önceyse VE Slot'un bitişi lunchStart'tan sonraysa -> Çakışma var
+            boolean overlapsLunch = currentTime.isBefore(lunchEnd) && slotEnd.isAfter(lunchStart);
+
+            if (!overlapsLunch) {
                 // Eğer bu saatte randevu yoksa ve saat geçmişte değilse ekle
                 if (!bookedTimes.contains(currentTime)) {
                     // Eğer bugün seçildiyse, geçmiş saatleri gösterme
@@ -157,7 +183,7 @@ public class AppointmentServiceImpl implements AppointmentService {
                     }
                 }
             }
-            currentTime = currentTime.plusMinutes(15);
+            currentTime = currentTime.plusMinutes(duration);
         }
 
         return availableSlots;

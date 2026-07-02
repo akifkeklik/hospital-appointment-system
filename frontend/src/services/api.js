@@ -142,3 +142,16 @@ export const SystemSettingService = {
     body: JSON.stringify(data)
   })
 };
+
+// ── DOCTOR LEAVES API ──
+export const DoctorLeaveService = {
+  getAll: () => fetchAPI('/admin/doctor-leaves'),
+  getByDoctorId: (doctorId) => fetchAPI(`/admin/doctor-leaves/doctor/${doctorId}`),
+  create: (data) => fetchAPI('/admin/doctor-leaves', {
+    method: 'POST',
+    body: JSON.stringify(data)
+  }),
+  delete: (id) => fetchAPI(`/admin/doctor-leaves/${id}`, {
+    method: 'DELETE'
+  })
+};

@@ -13,6 +13,8 @@ export default function SettingsPage() {
   const [apptDuration, setApptDuration] = useState('15');
   const [startTime, setStartTime] = useState('09:00');
   const [endTime, setEndTime] = useState('17:00');
+  const [lunchBreakStart, setLunchBreakStart] = useState('12:00');
+  const [lunchBreakEnd, setLunchBreakEnd] = useState('13:00');
   const [maintenanceMode, setMaintenanceMode] = useState(false);
 
   useEffect(() => {
@@ -24,6 +26,8 @@ export default function SettingsPage() {
           setApptDuration(settings.appointmentDuration.toString());
           setStartTime(settings.workStartTime);
           setEndTime(settings.workEndTime);
+          setLunchBreakStart(settings.lunchBreakStart || '12:00');
+          setLunchBreakEnd(settings.lunchBreakEnd || '13:00');
           setMaintenanceMode(settings.maintenanceMode);
         }).catch(err => console.error("Error fetching settings:", err));
       }
@@ -36,6 +40,8 @@ export default function SettingsPage() {
         appointmentDuration: parseInt(apptDuration),
         workStartTime: startTime,
         workEndTime: endTime,
+        lunchBreakStart: lunchBreakStart,
+        lunchBreakEnd: lunchBreakEnd,
         maintenanceMode: maintenanceMode
       });
       alert("Sistem ayarları başarıyla güncellendi!");
@@ -101,7 +107,27 @@ export default function SettingsPage() {
                 />
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1rem', backgroundColor: 'var(--background)', borderRadius: '8px', border: '1px solid var(--border)' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <label style={{ fontSize: '0.9rem', fontWeight: '600', color: 'var(--text-main)' }}>Öğle Arası Başlangıç</label>
+                <input 
+                  type="time" 
+                  value={lunchBreakStart}
+                  onChange={(e) => setLunchBreakStart(e.target.value)}
+                  style={{ padding: '0.8rem', borderRadius: '8px', border: '1px solid var(--border)', backgroundColor: 'var(--background)', color: 'var(--text-main)' }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <label style={{ fontSize: '0.9rem', fontWeight: '600', color: 'var(--text-main)' }}>Öğle Arası Bitiş</label>
+                <input 
+                  type="time" 
+                  value={lunchBreakEnd}
+                  onChange={(e) => setLunchBreakEnd(e.target.value)}
+                  style={{ padding: '0.8rem', borderRadius: '8px', border: '1px solid var(--border)', backgroundColor: 'var(--background)', color: 'var(--text-main)' }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1rem', backgroundColor: 'var(--background)', borderRadius: '8px', border: '1px solid var(--border)', gridColumn: '1 / -1' }}>
                 <div>
                   <div style={{ fontWeight: '600', color: 'var(--text-main)' }}>Bakım Modu</div>
                   <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Sistemi geçici olarak hasta erişimine kapatın.</div>

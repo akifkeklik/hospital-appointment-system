@@ -21,17 +21,25 @@ public class SystemSetting {
     @Column(name = "work_end_time", nullable = false)
     private String workEndTime = "17:00";
 
+    @Column(name = "lunch_break_start", nullable = false)
+    private String lunchBreakStart = "12:00";
+
+    @Column(name = "lunch_break_end", nullable = false)
+    private String lunchBreakEnd = "13:00";
+
     @Column(name = "maintenance_mode", nullable = false)
     private Boolean maintenanceMode = false;
 
     public SystemSetting() {
     }
 
-    public SystemSetting(Integer appointmentDuration, String workStartTime, String workEndTime, Boolean maintenanceMode) {
+    public SystemSetting(Integer appointmentDuration, String workStartTime, String workEndTime, String lunchBreakStart, String lunchBreakEnd, Boolean maintenanceMode) {
         this.id = 1L;
         this.appointmentDuration = appointmentDuration;
         this.workStartTime = workStartTime;
         this.workEndTime = workEndTime;
+        this.lunchBreakStart = lunchBreakStart;
+        this.lunchBreakEnd = lunchBreakEnd;
         this.maintenanceMode = maintenanceMode;
     }
 
@@ -65,6 +73,22 @@ public class SystemSetting {
 
     public void setWorkEndTime(String workEndTime) {
         this.workEndTime = workEndTime;
+    }
+
+    public String getLunchBreakStart() {
+        return lunchBreakStart;
+    }
+
+    public void setLunchBreakStart(String lunchBreakStart) {
+        this.lunchBreakStart = lunchBreakStart;
+    }
+
+    public String getLunchBreakEnd() {
+        return lunchBreakEnd;
+    }
+
+    public void setLunchBreakEnd(String lunchBreakEnd) {
+        this.lunchBreakEnd = lunchBreakEnd;
     }
 
     public Boolean getMaintenanceMode() {

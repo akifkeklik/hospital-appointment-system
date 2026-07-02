@@ -97,13 +97,13 @@ button {
   flex: 1;
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 .page-content {
   padding: 1.25rem;
   flex: 1;
+  overflow-y: auto;
 }
 
 /* Form elemanları ortak stiller */
