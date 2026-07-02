@@ -73,7 +73,7 @@ export default function BookAppointment() {
 
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:8080/api/appointments/available-slots?doctorId=${selectedDoctor.id}&date=${date}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api'}/appointments/available-slots?doctorId=${selectedDoctor.id}&date=${date}`, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
       if (response.ok) {

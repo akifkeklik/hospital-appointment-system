@@ -49,7 +49,7 @@ export default function Header() {
 
   const handleLogout = async () => {
     try {
-      await fetch('http://localhost:8080/api/auth/logout', { method: 'POST', credentials: 'include' });
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api'}/auth/logout`, { method: 'POST', credentials: 'include' });
     } catch (e) {
       console.error("Logout error", e);
     }

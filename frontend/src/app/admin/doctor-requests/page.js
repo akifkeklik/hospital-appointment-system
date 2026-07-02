@@ -15,7 +15,7 @@ export default function DoctorRequestsPage() {
 
   const fetchRequests = async () => {
     try {
-      const res = await fetch('http://localhost:8080/api/admin/doctor-requests', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api'}/admin/doctor-requests`, {
         headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -36,7 +36,7 @@ export default function DoctorRequestsPage() {
 
   const handleAction = async (id, action) => {
     try {
-      const res = await fetch(`http://localhost:8080/api/admin/doctor-requests/${id}/${action}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api'}/admin/doctor-requests/${id}/${action}`, {
         method: 'POST',
         headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
