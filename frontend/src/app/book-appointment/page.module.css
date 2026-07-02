@@ -9,7 +9,7 @@
   justify-content: space-between;
   align-items: center;
   position: relative;
-  margin-bottom: 3rem;
+  margin-bottom: 1.5rem;
 }
 
 .progressLine {
@@ -78,7 +78,7 @@
   background-color: var(--surface);
   border: 1px solid var(--border);
   border-radius: 16px;
-  padding: 3rem;
+  padding: 1.5rem 2rem;
   box-shadow: var(--shadow-lg);
   min-height: 400px;
 }
@@ -93,22 +93,22 @@
 }
 
 .stepTitle {
-  font-size: 1.5rem;
-  margin-bottom: 2rem;
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
   color: var(--text-main);
   text-align: center;
 }
 
 .gridContainer {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
 }
 
 .selectionCard {
   border: 1px solid var(--border);
   border-radius: 12px;
-  padding: 1.5rem;
+  padding: 1rem;
   text-align: center;
   cursor: pointer;
   transition: all 0.2s;
@@ -123,32 +123,32 @@
 }
 
 .cardIcon {
-  font-size: 2.5rem;
-  margin-bottom: 1rem;
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
 }
 
 .avatarCircle {
-  width: 60px;
-  height: 60px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   background-color: var(--primary);
   color: white;
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   font-weight: bold;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto 1rem auto;
+  margin: 0 auto 0.5rem auto;
 }
 
 .selectionCard h3 {
-  font-size: 1.1rem;
-  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+  margin-bottom: 0.25rem;
   color: var(--text-main);
 }
 
 .selectionCard p {
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   color: var(--text-muted);
 }
 

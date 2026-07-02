@@ -38,10 +38,20 @@ import java.time.LocalDateTime;
  * ║                                                                  ║
  * ╚══════════════════════════════════════════════════════════════════╝
  */
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.Version;
+
 @Entity
 @Table(name = "appointments")
 @SQLDelete(sql = "UPDATE appointments SET is_active = false WHERE id=?")
 @SQLRestriction("is_active = true")
+@EntityListeners(AuditingEntityListener.class)
 public class Appointment {
 
     @Id
@@ -106,6 +116,27 @@ public class Appointment {
     @Column(name = "is_active")
     private Boolean isActive = true;
 
+    // --- Enterprise Audit & Version Fields ---
+    @Version
+    @Column(name = "version")
+    private Long version;
+
+    @CreatedDate
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    @CreatedBy
+    @Column(name = "created_by", updatable = false)
+    private String createdBy;
+
+    @LastModifiedBy
+    @Column(name = "updated_by")
+    private String updatedBy;
+
     // JPA için ZORUNLU
     public Appointment() {
     }
@@ -166,5 +197,45 @@ public class Appointment {
 
     public void setIsActive(Boolean isActive) {
         this.isActive = isActive;
+    }
+
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public String getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(String updatedBy) {
+        this.updatedBy = updatedBy;
     }
 }

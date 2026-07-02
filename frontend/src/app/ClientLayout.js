@@ -63,7 +63,7 @@ export default function ClientLayout({ children }) {
           {role === 'ROLE_PATIENT' ? <PatientHeader /> : null}
           {role === 'ROLE_DOCTOR' ? <DoctorHeader /> : null}
           
-          <main className="patient-page-content" style={{ flex: 1, overflowY: 'hidden', padding: '2rem', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+          <main className="patient-page-content" style={{ flex: 1, overflowY: 'auto', padding: '2rem', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
             <div style={{ maxWidth: '1200px', margin: '0 auto', width: '100%', display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
               {children}
             </div>

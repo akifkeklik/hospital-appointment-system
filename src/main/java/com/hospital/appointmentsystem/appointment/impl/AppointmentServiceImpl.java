@@ -180,6 +180,23 @@ public class AppointmentServiceImpl implements AppointmentService {
 
         existingAppointment.setPatient(patient);
         existingAppointment.setDoctor(doctor);
+
+        // ⭐ Randevu saati değiştiyse veya doktor değiştiyse uygunluk kontrolü yap
+        boolean timeOrDoctorChanged = !existingAppointment.getAppointmentDate().equals(appointmentDto.getAppointmentDate()) || 
+                                      !existingAppointment.getDoctor().getId().equals(doctor.getId());
+                                      
+        if (timeOrDoctorChanged) {
+            LocalDate date = appointmentDto.getAppointmentDate().toLocalDate();
+            LocalTime time = appointmentDto.getAppointmentDate().toLocalTime();
+            
+            List<String> availableSlots = getAvailableSlots(doctor.getId(), date);
+            String timeString = String.format("%02d:%02d", time.getHour(), time.getMinute());
+            
+            if (!availableSlots.contains(timeString)) {
+                throw new RuntimeException("Seçilen randevu saati dolu veya mesai saatleri dışında!");
+            }
+        }
+
         existingAppointment.setAppointmentDate(appointmentDto.getAppointmentDate());
         existingAppointment.setNotes(appointmentDto.getNotes());
 

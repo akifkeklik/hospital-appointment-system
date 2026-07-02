@@ -54,7 +54,7 @@ export default function DoctorRequestsPage() {
         throw new Error(errorMsg);
       }
       setConfirmModal({ show: false, type: '', reqId: null, message: '' });
-      toast.success(action === 'approve' ? 'Doktor onaylandı!' : 'İstek reddedildi.');
+      toast.success(action === 'approve' ? t('approve_success') : t('reject_success'));
       fetchRequests(); // Refresh list
     } catch (err) {
       setConfirmModal({ show: false, type: '', reqId: null, message: '' });
@@ -68,26 +68,32 @@ export default function DoctorRequestsPage() {
     }
   };
 
-  if (loading) return <div>Yükleniyor...</div>;
+  if (loading) return <div>{t('loading')}</div>;
   if (error) return <div style={{ color: 'red' }}>{error}</div>;
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.title}>Doktor Kayıt İstekleri</h1>
+      <h1 className={styles.title}>{t('doctor_requests_title')}</h1>
       
       {requests.length === 0 ? (
-        <p>Bekleyen doktor kayıt isteği bulunmamaktadır.</p>
+        <div className={styles.emptyState}>
+          <div className={styles.emptyStateIconWrapper}>
+            <i className="fi fi-rr-inbox"></i>
+          </div>
+          <h2 className={styles.emptyStateTitle}>{t('no_pending_requests')}</h2>
+          <p className={styles.emptyStateDesc}>{t('no_pending_requests_desc')}</p>
+        </div>
       ) : (
         <div className={styles.tableContainer}>
           <table className={styles.table}>
             <thead>
               <tr>
-                <th>Tarih</th>
-                <th>Ad Soyad</th>
-                <th>TC No</th>
-                <th>Uzmanlık</th>
-                <th>E-Posta</th>
-                <th>İşlemler</th>
+                <th>{t('date')}</th>
+                <th>{t('title_desc')}</th>
+                <th>{t('tc_no')}</th>
+                <th>{t('specialization')}</th>
+                <th>{t('email')}</th>
+                <th>{t('actions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -104,22 +110,22 @@ export default function DoctorRequestsPage() {
                         show: true,
                         type: 'approve',
                         reqId: req.id,
-                        message: `${req.firstName} ${req.lastName} isimli doktoru onaylıyor musunuz? Şifresi otomatik olarak hesaba atanacaktır.`
+                        message: `${req.firstName} ${req.lastName} ${t('approve_confirm')}`
                       })}
                       className={styles.approveBtn}
                     >
-                      Onayla
+                      {t('approve')}
                     </button>
                     <button 
                       onClick={() => setConfirmModal({
                         show: true,
                         type: 'reject',
                         reqId: req.id,
-                        message: 'Bu isteği reddetmek istediğinize emin misiniz?'
+                        message: t('reject_confirm')
                       })}
                       className={styles.rejectBtn}
                     >
-                      Reddet
+                      {t('reject')}
                     </button>
                   </td>
                 </tr>
@@ -132,11 +138,11 @@ export default function DoctorRequestsPage() {
       {/* Custom Modern Confirm Modal */}
       <ConfirmModal
         isOpen={confirmModal.show}
-        title="Onay Bekliyor"
+        title={t('doctor_requests_title')}
         message={confirmModal.message}
         onConfirm={executeConfirm}
         onCancel={() => setConfirmModal({...confirmModal, show: false})}
-        confirmText={confirmModal.type === 'approve' ? 'Evet, Onayla' : 'Evet, Reddet'}
+        confirmText={confirmModal.type === 'approve' ? t('approve') : t('reject')}
         type={confirmModal.type === 'approve' ? 'approve' : 'danger'}
       />
     </div>

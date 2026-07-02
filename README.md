@@ -22,7 +22,12 @@ This project goes beyond a standard dashboard by delivering a **"Premium"** web 
 - **Smart Registration System (Doctor Requests):** Doctors wishing to join the system create a "Registration Request". Administrators can approve or reject these requests through a sleek UI.
 - **BCrypt Encryption:** User passwords are encrypted with an irreversible hash rather than plain text.
 
-### 4. Domain-Driven Design (DDD) Architecture
+### 4. Enterprise Architecture (Production-Ready)
+- **Optimistic Locking:** Eliminates race conditions entirely via database versioning. If two patients attempt to book the exact same slot at the exact same millisecond, the system safely handles the collision and notifies the user.
+- **JPA Auditing (Audit Logs):** Every transaction in the system is automatically tracked (Who created it and When). This provides strict historical accountability and auditing.
+- **HttpOnly Cookies:** We moved away from vulnerable `localStorage` tokens. JWTs are now transmitted directly via secure, unreadable-by-JS `HttpOnly` cookies, nullifying Cross-Site Scripting (XSS) risks.
+
+### 5. Domain-Driven Design (DDD) Architecture
 - The backend is cleanly separated into `api`, `impl`, and `web` packages to maintain modularity.
 - This strict architectural pattern prevents spaghetti code and ensures long-term maintainability.
 
@@ -126,8 +131,10 @@ npm install
 npm run dev
 ```
 
-### 4. Usage Steps
+### 4. Default Accounts & Usage
 - Open your browser and navigate to `http://localhost:3000`.
-- The security mechanism will redirect you directly to the **Login** screen as no token will be found.
-- For the first use, go to the Admin tab, click "Are you an admin? Register", and create a root administrator account for the system.
-- Once logged in as an admin, click the "Settings (Gear ⚙️)" icon in the top right corner to switch between 12 different color themes and languages, and enjoy the premium design! 🎉
+- The system automatically creates a default administrator account upon first startup.
+- **Admin Login:**
+  - **Username/TC No:** `admin`
+  - **Password:** `admin123`
+- Once logged in as an admin, you can view the Admin Dashboard, approve doctor requests, and manage the system. Click the "Settings (Gear ⚙️)" icon in the top right corner to switch between 12 different color themes and languages, and enjoy the premium design! 🎉

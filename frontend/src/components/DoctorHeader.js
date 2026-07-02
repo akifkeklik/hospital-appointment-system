@@ -52,7 +52,7 @@ export default function DoctorHeader() {
 
   const initial = userProfile?.firstName && userProfile?.lastName 
     ? `${userProfile.firstName.charAt(0)}${userProfile.lastName.charAt(0)}`.toUpperCase() 
-    : userProfile?.firstName ? userProfile.firstName.charAt(0).toUpperCase() : 'D';
+    : userProfile?.firstName ? userProfile.firstName.charAt(0).toUpperCase() : '';
 
   const headerStyle = {
     display: 'flex',
@@ -72,15 +72,15 @@ export default function DoctorHeader() {
   };
 
   const logoIconStyle = {
-    width: '40px',
-    height: '40px',
-    backgroundColor: 'var(--primary)',
-    borderRadius: '8px',
+    width: '38px',
+    height: '38px',
+    minWidth: '38px',
+    background: 'linear-gradient(135deg, var(--primary), var(--primary-hover))',
+    borderRadius: '10px',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    color: 'white',
-    boxShadow: '0 4px 6px -1px rgba(99, 102, 241, 0.4)'
+    color: 'white'
   };
 
   const titleStyle = {
@@ -117,14 +117,78 @@ export default function DoctorHeader() {
     transition: 'all 0.2s',
   };
 
+  const dropdownMenuStyle = {
+    position: 'absolute',
+    top: 'calc(100% + 10px)',
+    right: '0',
+    width: '260px',
+    backgroundColor: 'var(--surface)',
+    border: '1px solid var(--border)',
+    borderRadius: '16px',
+    boxShadow: '0 10px 40px -10px rgba(0,0,0,0.2)',
+    zIndex: 100,
+    overflow: 'hidden'
+  };
+
+  const dropdownHeaderStyle = {
+    padding: '1.2rem',
+    background: 'linear-gradient(135deg, rgba(var(--primary-rgb), 0.1), transparent)',
+    borderBottom: '1px solid var(--border)',
+    display: 'flex',
+    flexDirection: 'column'
+  };
+
+  const dropdownBodyStyle = {
+    padding: '1rem',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '0.8rem'
+  };
+
+  const dropdownItemStyle = {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    fontSize: '0.85rem'
+  };
+
+  const itemLabelStyle = {
+    color: 'var(--text-muted)',
+    fontWeight: '500'
+  };
+
+  const itemValueStyle = {
+    color: 'var(--text-main)',
+    fontWeight: '600'
+  };
+
+  const dropdownFooterStyle = {
+    padding: '1rem',
+    borderTop: '1px solid var(--border)',
+    backgroundColor: 'rgba(var(--background-rgb), 0.5)'
+  };
+
+  const logoutBtnStyle = {
+    width: '100%',
+    padding: '0.8rem',
+    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+    color: '#ef4444',
+    border: '1px solid rgba(239, 68, 68, 0.2)',
+    borderRadius: '8px',
+    fontWeight: '600',
+    textAlign: 'center',
+    cursor: 'pointer',
+    transition: 'all 0.2s ease'
+  };
+
   return (
     <header style={headerStyle}>
       {/* Sol Logo */}
       <div style={logoStyle} onClick={() => router.push('/')}>
         <div style={logoIconStyle}>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
-          </svg>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="#ffffff" stroke="rgba(255,255,255,0.4)" strokeWidth="0.5">
+              <path d="M 19 3 A 10 10 0 1 0 19 21 A 9.5 9.5 0 1 1 19 3 Z" />
+            </svg>
         </div>
         <div>
           <div style={titleStyle}>{t('logo_title')}</div>
@@ -174,23 +238,42 @@ export default function DoctorHeader() {
             </svg>
           </button>
 
-          {isDropdownOpen && (
-            <div style={{ position: 'absolute', top: 'calc(100% + 0.5rem)', right: '0', width: '240px', backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '8px', boxShadow: 'var(--shadow-lg)', zIndex: 1000, overflow: 'hidden' }}>
-              <div style={{ padding: '1rem', borderBottom: '1px solid var(--border)' }}>
-                <p style={{ fontWeight: '600', color: 'var(--text-main)', marginBottom: '0.25rem' }}>Dr. {userProfile?.firstName} {userProfile?.lastName}</p>
-                <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', wordBreak: 'break-all' }}>{userProfile?.email}</p>
+          {isDropdownOpen && userProfile && (
+            <div style={dropdownMenuStyle}>
+              <div style={dropdownHeaderStyle}>
+                <strong style={{ color: 'var(--text-main)', fontSize: '1.05rem', marginBottom: '0.2rem', display: 'block' }}>{userProfile.firstName} {userProfile.lastName}</strong>
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{userProfile.email}</span>
               </div>
-              
-              <div style={{ padding: '0.5rem 0' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.5rem 1rem', fontSize: '0.85rem' }}>
-                  <span style={{ color: 'var(--text-muted)' }}>Telefon:</span>
-                  <span style={{ fontWeight: '500', color: 'var(--text-main)' }}>{userProfile?.phoneNumber || '-'}</span>
+              <div style={dropdownBodyStyle}>
+                <div style={dropdownItemStyle}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-muted)' }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    <span style={itemLabelStyle}>{t('role')}</span>
+                  </div>
+                  <span style={{ ...itemValueStyle, color: 'var(--primary)', fontWeight: '700' }}>{t('doctor')}</span>
+                </div>
+                <div style={dropdownItemStyle}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-muted)' }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                    <span style={itemLabelStyle}>{t('tc_no')}</span>
+                  </div>
+                  <span style={itemValueStyle}>{userProfile.username}</span>
+                </div>
+                <div style={dropdownItemStyle}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-muted)' }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                    <span style={itemLabelStyle}>{t('phone')}</span>
+                  </div>
+                  <span style={itemValueStyle}>{userProfile.phoneNumber || '-'}</span>
                 </div>
               </div>
-
-              <div style={{ padding: '0.5rem' }}>
-                <button onClick={handleLogout} style={{ width: '100%', padding: '0.75rem', backgroundColor: 'transparent', border: 'none', color: 'var(--danger)', fontWeight: '500', textAlign: 'center', cursor: 'pointer', borderRadius: '6px', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem' }}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+              <div style={dropdownFooterStyle}>
+                <button 
+                  onClick={handleLogout} 
+                  style={logoutBtnStyle}
+                  onMouseOver={(e) => { e.currentTarget.style.backgroundColor = '#ef4444'; e.currentTarget.style.color = 'white'; }}
+                  onMouseOut={(e) => { e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.1)'; e.currentTarget.style.color = '#ef4444'; }}
+                >
                   {t('logout') || 'Sistemden Çıkış Yap'}
                 </button>
               </div>

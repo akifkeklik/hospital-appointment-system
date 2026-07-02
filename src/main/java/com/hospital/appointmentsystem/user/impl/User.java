@@ -26,6 +26,9 @@ public class User {
     @Column(name = "reference_id")
     private Long referenceId;
 
+    @Column(name = "needs_password_change", nullable = false)
+    private Boolean needsPasswordChange = false;
+
     public User() {}
 
     public User(String username, String email, String password, String role, Long referenceId) {
@@ -47,4 +50,6 @@ public class User {
     public void setRole(String role) { this.role = role; }
     public Long getReferenceId() { return referenceId; }
     public void setReferenceId(Long referenceId) { this.referenceId = referenceId; }
+    public Boolean getNeedsPasswordChange() { return needsPasswordChange; }
+    public void setNeedsPasswordChange(Boolean needsPasswordChange) { this.needsPasswordChange = needsPasswordChange; }
 }

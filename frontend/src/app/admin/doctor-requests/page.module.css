@@ -99,13 +99,62 @@
   right: 1rem;
   background: transparent;
   border: none;
+  font-size: 1.5rem;
   color: var(--text-muted);
   cursor: pointer;
   transition: color 0.2s;
 }
 
 .customCloseBtn:hover {
+  color: var(--danger);
+}
+
+/* Empty State Modern Styling */
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 5rem 2rem;
+  background: color-mix(in srgb, var(--primary) 4%, var(--surface));
+  border: 1px dashed color-mix(in srgb, var(--primary) 30%, var(--border));
+  border-radius: 16px;
+  text-align: center;
+  color: var(--text-muted);
+  gap: 20px;
+  animation: fadeIn 0.5s ease-out;
+  box-shadow: inset 0 0 20px rgba(var(--primary-rgb), 0.02);
+  margin-top: 1rem;
+}
+
+.emptyStateIconWrapper {
+  width: 80px;
+  height: 80px;
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
+  color: var(--primary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  box-shadow: 0 8px 32px rgba(var(--primary-rgb), 0.09);
+  margin-bottom: 8px;
+}
+
+.emptyStateTitle {
+  font-size: 1.5rem;
+  font-weight: 600;
   color: var(--text-main);
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.emptyStateDesc {
+  font-size: 1.05rem;
+  max-width: 450px;
+  margin: 0;
+  line-height: 1.6;
+  opacity: 0.85;
 }
 
 .customModalIcon {

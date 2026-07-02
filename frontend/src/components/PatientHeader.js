@@ -51,15 +51,15 @@ export default function PatientHeader() {
 
   const initial = userProfile?.firstName && userProfile?.lastName 
     ? `${userProfile.firstName.charAt(0)}${userProfile.lastName.charAt(0)}`.toUpperCase() 
-    : userProfile?.firstName ? userProfile.firstName.charAt(0).toUpperCase() : 'U';
+    : userProfile?.firstName ? userProfile.firstName.charAt(0).toUpperCase() : '';
 
   return (
     <header style={headerStyle}>
       <div style={logoContainerStyle}>
         <Link href="/" style={logoStyle}>
           <div style={iconStyle}>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="#ffffff" stroke="rgba(255,255,255,0.4)" strokeWidth="0.5">
+              <path d="M 19 3 A 10 10 0 1 0 19 21 A 9.5 9.5 0 1 1 19 3 Z" />
             </svg>
           </div>
           <div>
@@ -70,9 +70,7 @@ export default function PatientHeader() {
       </div>
       
       <div style={actionsStyle}>
-        <Link href="/book-appointment" style={bookBtnStyle}>
-          {t('create_appointment') || 'Yeni Randevu'}
-        </Link>
+
         <button style={themeToggleStyle} onClick={toggleTheme} title="Tema Değiştir">
           {theme === 'light' ? (
              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -114,19 +112,41 @@ export default function PatientHeader() {
 
           {isDropdownOpen && userProfile && (
             <div style={dropdownMenuStyle}>
-              <div style={{ padding: '1rem', borderBottom: '1px solid var(--border)' }}>
-                <strong style={{ display: 'block', color: 'var(--text-main)' }}>{userProfile.firstName} {userProfile.lastName}</strong>
+              <div style={dropdownHeaderStyle}>
+                <strong style={{ color: 'var(--text-main)', fontSize: '1.05rem', marginBottom: '0.2rem', display: 'block' }}>{userProfile.firstName} {userProfile.lastName}</strong>
                 <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{userProfile.email}</span>
               </div>
-              <div style={{ padding: '0.5rem' }}>
+              <div style={dropdownBodyStyle}>
                 <div style={dropdownItemStyle}>
-                  <span style={itemLabelStyle}>{t('tc_no') || 'TC No'}:</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-muted)' }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    <span style={itemLabelStyle}>{t('role')}</span>
+                  </div>
+                  <span style={{ ...itemValueStyle, color: 'var(--primary)', fontWeight: '700' }}>{t('patient')}</span>
+                </div>
+                <div style={dropdownItemStyle}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-muted)' }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                    <span style={itemLabelStyle}>{t('tc_no')}</span>
+                  </div>
                   <span style={itemValueStyle}>{userProfile.username}</span>
                 </div>
+                <div style={dropdownItemStyle}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-muted)' }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                    <span style={itemLabelStyle}>{t('phone')}</span>
+                  </div>
+                  <span style={itemValueStyle}>{userProfile.phoneNumber || '-'}</span>
+                </div>
               </div>
-              <div style={{ padding: '0.5rem', borderTop: '1px solid var(--border)' }}>
-                <button onClick={handleLogout} style={logoutBtnStyle}>
-                  {t('logout') || 'Çıkış Yap'}
+              <div style={dropdownFooterStyle}>
+                <button 
+                  onClick={handleLogout} 
+                  style={logoutBtnStyle}
+                  onMouseOver={(e) => { e.currentTarget.style.backgroundColor = '#ef4444'; e.currentTarget.style.color = 'white'; }}
+                  onMouseOut={(e) => { e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.1)'; e.currentTarget.style.color = '#ef4444'; }}
+                >
+                  {t('logout') || 'Sistemden Çıkış Yap'}
                 </button>
               </div>
             </div>
@@ -166,11 +186,12 @@ const logoStyle = {
 };
 
 const iconStyle = {
-  backgroundColor: 'var(--primary)',
+  background: 'linear-gradient(135deg, var(--primary), var(--primary-hover))',
   color: '#ffffff',
-  width: '36px',
-  height: '36px',
-  borderRadius: '8px',
+  width: '38px',
+  height: '38px',
+  minWidth: '38px',
+  borderRadius: '10px',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
@@ -269,42 +290,64 @@ const roleStyle = {
 
 const dropdownMenuStyle = {
   position: 'absolute',
-  top: 'calc(100% + 0.5rem)',
+  top: 'calc(100% + 10px)',
   right: '0',
-  width: '240px',
+  width: '260px',
   backgroundColor: 'var(--surface)',
   border: '1px solid var(--border)',
-  borderRadius: '8px',
-  boxShadow: 'var(--shadow-lg)',
-  zIndex: 1000,
+  borderRadius: '16px',
+  boxShadow: '0 10px 40px -10px rgba(0,0,0,0.2)',
+  zIndex: 100,
   overflow: 'hidden'
+};
+
+const dropdownHeaderStyle = {
+  padding: '1.2rem',
+  background: 'linear-gradient(135deg, rgba(var(--primary-rgb), 0.1), transparent)',
+  borderBottom: '1px solid var(--border)',
+  display: 'flex',
+  flexDirection: 'column'
+};
+
+const dropdownBodyStyle = {
+  padding: '1rem',
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '0.8rem'
 };
 
 const dropdownItemStyle = {
   display: 'flex',
   justifyContent: 'space-between',
-  padding: '0.5rem',
+  alignItems: 'center',
   fontSize: '0.85rem'
 };
 
 const itemLabelStyle = {
-  color: 'var(--text-muted)'
+  color: 'var(--text-muted)',
+  fontWeight: '500'
 };
 
 const itemValueStyle = {
-  fontWeight: '500',
-  color: 'var(--text-main)'
+  color: 'var(--text-main)',
+  fontWeight: '600'
+};
+
+const dropdownFooterStyle = {
+  padding: '1rem',
+  borderTop: '1px solid var(--border)',
+  backgroundColor: 'rgba(var(--background-rgb), 0.5)'
 };
 
 const logoutBtnStyle = {
   width: '100%',
-  padding: '0.75rem',
-  backgroundColor: 'transparent',
-  border: 'none',
-  color: 'var(--danger)',
-  fontWeight: '500',
+  padding: '0.8rem',
+  backgroundColor: 'rgba(239, 68, 68, 0.1)',
+  color: '#ef4444',
+  border: '1px solid rgba(239, 68, 68, 0.2)',
+  borderRadius: '8px',
+  fontWeight: '600',
   textAlign: 'center',
   cursor: 'pointer',
-  transition: 'background-color 0.2s',
-  borderRadius: '6px'
+  transition: 'all 0.2s ease'
 };

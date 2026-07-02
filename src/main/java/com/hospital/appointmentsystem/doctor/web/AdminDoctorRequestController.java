@@ -57,20 +57,20 @@ public class AdminDoctorRequestController {
             
             DoctorDto savedDoctor = doctorService.createDoctor(dto);
 
-            // 2. User kaydını oluştur (ROLE_DOCTOR)
-            userService.registerUser(
-                request.getTcIdentityNumber(), 
-                request.getEmail(), 
-                request.getPassword(), 
-                "ROLE_DOCTOR", 
-                savedDoctor.getId()
-            );
+            // Rastgele Tek Kullanımlık Şifre (OTP) Üretimi
+            String tempPassword = "DR-" + java.util.UUID.randomUUID().toString().substring(0, 5).toUpperCase();
+
+            // 2. User kaydı doctorService içinde zaten oluşturulduğu için sadece güncelliyoruz
+            userService.changePassword(request.getTcIdentityNumber(), tempPassword);
+
+            // Şifre yenileme zorunluluğunu aktif et
+            userService.setNeedsPasswordChange(request.getTcIdentityNumber(), true);
 
             // 3. İsteği APPROVED olarak güncelle
             request.setStatus("APPROVED");
             repository.save(request);
 
-            return ResponseEntity.ok(new MessageResponse("Doktor başarıyla onaylandı ve sisteme kaydedildi."));
+            return ResponseEntity.ok(new MessageResponse("Doktor başarıyla onaylandı. İlk giriş için geçici şifresi: " + tempPassword + " (Lütfen hekime iletiniz)"));
         } catch (Exception e) {
             String msg = e.getMessage() != null ? e.getMessage() : "";
             Throwable cause = e.getCause();

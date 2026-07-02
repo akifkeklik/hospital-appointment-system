@@ -16,14 +16,12 @@ async function fetchAPI(endpoint, options = {}) {
     'Accept': 'application/json'
   };
 
-  // JWT Token'ı localStorage'dan al ve varsa header'a ekle
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-  if (token) {
-    defaultHeaders['Authorization'] = `Bearer ${token}`;
-  }
+  // Artık Token'ı Cookie'den alacağımız için Authorization header'a gerek yok.
+  // Geriye dönük uyumluluk için localStorage'da kaldıysa temizlenecek (logout aşamasında)
 
   const config = {
     ...options,
+    credentials: 'include', // Cookie'leri backend'e gönder!
     headers: {
       ...defaultHeaders,
       ...options.headers,
@@ -35,10 +33,11 @@ async function fetchAPI(endpoint, options = {}) {
 
     // Eğer başarılı değilse hata fırlat
     if (!response.ok) {
-      if (response.status === 401 || response.status === 403) {
+      if (response.status === 401 || response.status === 403 || (response.status === 500 && url.includes('/me'))) {
         if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
           localStorage.removeItem('token');
           window.location.href = '/login';
+          return new Promise(() => {}); // Redirect esnasında hata fırlatmayı engellemek için askıda bırak
         }
       }
 
@@ -127,6 +126,10 @@ export const AuthService = {
   resetPassword: (tcIdentityNumber, email, newPassword) => fetchAPI('/auth/reset-password', {
     method: 'POST',
     body: JSON.stringify({ tcIdentityNumber, email, newPassword })
+  }),
+  forceChangePassword: (tcIdentityNumber, newPassword) => fetchAPI('/auth/force-change-password', {
+    method: 'POST',
+    body: JSON.stringify({ tcIdentityNumber, newPassword })
   }),
   getMe: () => fetchAPI('/auth/me'),
 };

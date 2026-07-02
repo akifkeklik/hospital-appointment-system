@@ -49,8 +49,12 @@ export default function RegisterPage() {
 
   return (
     <div className={styles.container}>
-      <div className={styles.loginCard} style={{ maxWidth: '450px' }}>
-        <div className={styles.logo}>HRS</div>
+      <div className={styles.loginCard} style={{ maxWidth: '500px' }}>
+        <div className={styles.logo}>
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="#ffffff" stroke="rgba(255,255,255,0.4)" strokeWidth="0.5">
+            <path d="M 19 3 A 10 10 0 1 0 19 21 A 9.5 9.5 0 1 1 19 3 Z" />
+          </svg>
+        </div>
         <h1 className={styles.title}>Hasta Kayıt</h1>
         <p className={styles.subtitle}>Randevu almak için hasta hesabınızı oluşturun.</p>
 
@@ -62,22 +66,37 @@ export default function RegisterPage() {
         )}
 
         <form className={styles.form} onSubmit={handleRegister}>
-          <div className={styles.inputGroup}>
-            <label className={styles.label}>TC Kimlik Numarası</label>
-            <input
-              type="text"
-              name="tcIdentityNumber"
-              className={styles.input}
-              placeholder="11 haneli TC kimlik no"
-              value={formData.tcIdentityNumber}
-              onChange={handleChange}
-              maxLength={11}
-              required
-            />
-          </div>
-          
-          <div style={{ display: 'flex', gap: '10px' }}>
-            <div className={styles.inputGroup} style={{ flex: 1 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+            <div className={styles.inputGroup}>
+              <label className={styles.label}>TC Kimlik Numarası</label>
+              <input
+                type="text"
+                name="tcIdentityNumber"
+                className={styles.input}
+                placeholder="11 haneli TC kimlik no"
+                value={formData.tcIdentityNumber}
+                onChange={(e) => setFormData({...formData, tcIdentityNumber: e.target.value.replace(/[^0-9]/g, '')})}
+                maxLength={11}
+                required
+              />
+            </div>
+            
+            <div className={styles.inputGroup}>
+              <label className={styles.label}>Telefon Numarası</label>
+              <input
+                type="tel"
+                name="phoneNumber"
+                className={styles.input}
+                placeholder="05554443322"
+                pattern="[0-9]{10,11}"
+                maxLength="11"
+                value={formData.phoneNumber}
+                onChange={(e) => setFormData({...formData, phoneNumber: e.target.value.replace(/[^0-9]/g, '')})}
+                required
+              />
+            </div>
+
+            <div className={styles.inputGroup}>
               <label className={styles.label}>Ad</label>
               <input
                 type="text"
@@ -89,7 +108,8 @@ export default function RegisterPage() {
                 required
               />
             </div>
-            <div className={styles.inputGroup} style={{ flex: 1 }}>
+
+            <div className={styles.inputGroup}>
               <label className={styles.label}>Soyad</label>
               <input
                 type="text"
@@ -101,49 +121,35 @@ export default function RegisterPage() {
                 required
               />
             </div>
+
+            <div className={styles.inputGroup}>
+              <label className={styles.label}>E-Posta</label>
+              <input
+                type="email"
+                name="email"
+                className={styles.input}
+                placeholder="ornek@mail.com"
+                value={formData.email}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            <div className={styles.inputGroup}>
+              <label className={styles.label}>Şifre</label>
+              <input
+                type="password"
+                name="password"
+                className={styles.input}
+                placeholder="Şifrenizi giriniz"
+                value={formData.password}
+                onChange={handleChange}
+                required
+              />
+            </div>
           </div>
 
-          <div className={styles.inputGroup}>
-            <label className={styles.label}>E-Posta</label>
-            <input
-              type="email"
-              name="email"
-              className={styles.input}
-              placeholder="Mail adresiniz"
-              value={formData.email}
-              onChange={handleChange}
-              required
-            />
-          </div>
-
-          <div className={styles.inputGroup}>
-            <label className={styles.label}>Telefon Numarası</label>
-            <input
-              type="tel"
-              name="phoneNumber"
-              className={styles.input}
-              placeholder="0555 555 5555"
-              value={formData.phoneNumber}
-              onChange={handleChange}
-              required
-            />
-          </div>
-
-          <div className={styles.inputGroup}>
-            <label className={styles.label}>Şifre</label>
-            <input
-              type="password"
-              name="password"
-              className={styles.input}
-              placeholder="En az 6 karakter"
-              value={formData.password}
-              onChange={handleChange}
-              required
-              minLength={6}
-            />
-          </div>
-
-          <button type="submit" className={styles.button} disabled={loading || success}>
+          <button type="submit" className={styles.button} disabled={loading || success} style={{ marginTop: '10px' }}>
             {loading ? 'Kaydediliyor...' : 'Kayıt Ol'}
           </button>
           

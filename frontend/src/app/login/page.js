@@ -17,8 +17,13 @@ export default function LoginPage() {
   const router = useRouter();
   const [loginType, setLoginType] = useState(null); // 'PATIENT', 'DOCTOR', veya 'ADMIN'
   const [showDoctorRegister, setShowDoctorRegister] = useState(false);
+  const [showForcePasswordChange, setShowForcePasswordChange] = useState(false);
+  
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [passwordConfirm, setPasswordConfirm] = useState('');
+  const [tempToken, setTempToken] = useState('');
+  
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
@@ -26,13 +31,19 @@ export default function LoginPage() {
 
   // Doctor Registration Form State
   const [regData, setRegData] = useState({
-    tcIdentityNumber: '', firstName: '', lastName: '', email: '', phoneNumber: '', specialization: '', departmentId: '', password: ''
+    tcIdentityNumber: '', firstName: '', lastName: '', email: '', phoneNumber: '', specialization: '', departmentId: ''
   });
 
   useEffect(() => {
     if (showDoctorRegister) {
-      DepartmentService.getAll()
-        .then(data => setDepartments(data))
+      DepartmentService.getAll(0, 100)
+        .then(data => {
+            if (data.content) {
+                setDepartments(data.content);
+            } else if (Array.isArray(data)) {
+                setDepartments(data);
+            }
+        })
         .catch(err => console.error("Bölümler yüklenemedi", err));
     }
   }, [showDoctorRegister]);
@@ -57,6 +68,13 @@ export default function LoginPage() {
         if (!valid) {
           setError('Hata: Seçtiğiniz giriş tipiyle hesabınızın yetkisi uyuşmuyor!');
           setLoading(false);
+          return;
+        }
+
+        if (response.needsPasswordChange) {
+          setTempToken(response.token);
+          setPassword('');
+          setShowForcePasswordChange(true);
           return;
         }
 
@@ -91,11 +109,31 @@ export default function LoginPage() {
       if (!res.ok) {
         throw new Error(data.message || data.error || 'Kayıt başarısız oldu');
       }
-      setSuccessMsg(data.message || 'Kayıt talebiniz alındı. Yönetici onayından sonra giriş yapabilirsiniz.');
+      setSuccessMsg(data.message || 'Başvurunuz alınmıştır. Yönetici onayından sonra geçici şifreniz oluşturulacaktır.');
       setShowDoctorRegister(false);
-      setRegData({tcIdentityNumber: '', firstName: '', lastName: '', email: '', phoneNumber: '', specialization: '', departmentId: '', password: ''});
+      setRegData({tcIdentityNumber: '', firstName: '', lastName: '', email: '', phoneNumber: '', specialization: '', departmentId: ''});
     } catch (err) {
       setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleForceChangeSubmit = async (e) => {
+    e.preventDefault();
+    if (password !== passwordConfirm) {
+      setError("Şifreler eşleşmiyor!");
+      return;
+    }
+    setLoading(true);
+    setError('');
+    try {
+      await AuthService.forceChangePassword(username.trim(), password);
+      // Başarılı olursa token'ı kaydet ve devam et
+      localStorage.setItem('token', tempToken);
+      router.push('/');
+    } catch (err) {
+      setError(err.message || 'Şifre güncellenemedi.');
     } finally {
       setLoading(false);
     }
@@ -104,8 +142,8 @@ export default function LoginPage() {
   const renderInitialSelection = () => (
     <div className={styles.loginCard} style={{ maxWidth: '600px' }}>
       <div className={styles.logo}>
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="#ffffff" stroke="rgba(255,255,255,0.4)" strokeWidth="0.5">
+          <path d="M 19 3 A 10 10 0 1 0 19 21 A 9.5 9.5 0 1 1 19 3 Z" />
         </svg>
       </div>
       <h1 className={styles.title}>Giriş Yap</h1>
@@ -128,7 +166,7 @@ export default function LoginPage() {
             <path d="M12 8v4" />
             <path d="M10 10h4" />
           </svg>
-          <span className={styles.roleText}>Doktor Girişi</span>
+          <span className={styles.roleText}>Hekim Girişi</span>
         </button>
 
         <button onClick={() => setLoginType('ADMIN')} className={styles.roleButton}>
@@ -152,7 +190,7 @@ export default function LoginPage() {
         placeholder = '11 Haneli TC Kimlik';
         break;
       case 'DOCTOR':
-        title = 'Doktor Girişi';
+        title = 'Hekim Girişi';
         placeholder = 'TC Kimlik Numarası';
         break;
       case 'ADMIN':
@@ -164,8 +202,8 @@ export default function LoginPage() {
     return (
       <div className={styles.loginCard}>
         <div className={styles.logo}>
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="#ffffff" stroke="rgba(255,255,255,0.4)" strokeWidth="0.5">
+            <path d="M 19 3 A 10 10 0 1 0 19 21 A 9.5 9.5 0 1 1 19 3 Z" />
           </svg>
         </div>
         <h1 className={styles.title}>{title}</h1>
@@ -236,12 +274,12 @@ export default function LoginPage() {
           </div>
         </form>
 
-        {successMsg && <div className={styles.successMsg}>{successMsg}</div>}
+        {successMsg && <div className={styles.success}>{successMsg}</div>}
 
         {loginType === 'DOCTOR' && !showDoctorRegister && (
           <div style={{textAlign: 'center', marginTop: '1rem'}}>
-             <button type="button" onClick={() => { setShowDoctorRegister(true); setError(''); setSuccessMsg(''); }} className={styles.linkButton} style={{background: 'none', border: 'none', color: 'var(--primary)', cursor: 'pointer', textDecoration: 'underline'}}>
-               Yeni Doktor Kaydı / Şifre Al
+             <button type="button" onClick={() => { setShowDoctorRegister(true); setError(''); setSuccessMsg(''); }} className={styles.linkButton} style={{marginTop: '1rem'}}>
+               Sisteme Nasıl Kayıt Olurum?
              </button>
           </div>
         )}
@@ -257,10 +295,10 @@ export default function LoginPage() {
         <p className={styles.subtitle}>Sisteme dahil olmak için bilgilerinizi giriniz. Talebiniz yönetici onayına sunulacaktır.</p>
 
         <form onSubmit={handleDoctorRegister} className={styles.form}>
-          <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem'}}>
+          <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem'}}>
             <div className={styles.inputGroup}>
                 <label>TC Kimlik No</label>
-                <input type="text" maxLength="11" required value={regData.tcIdentityNumber} onChange={(e) => setRegData({...regData, tcIdentityNumber: e.target.value})} className={styles.input} />
+                <input type="text" pattern="[0-9]{11}" maxLength="11" required value={regData.tcIdentityNumber} onChange={(e) => setRegData({...regData, tcIdentityNumber: e.target.value.replace(/[^0-9]/g, '')})} className={styles.input} placeholder="11 Haneli" />
             </div>
             <div className={styles.inputGroup}>
                 <label>Bölüm</label>
@@ -278,19 +316,19 @@ export default function LoginPage() {
             </div>
             <div className={styles.inputGroup}>
                 <label>Ad</label>
-                <input type="text" required value={regData.firstName} onChange={(e) => setRegData({...regData, firstName: e.target.value})} className={styles.input} />
+                <input type="text" required value={regData.firstName} onChange={(e) => setRegData({...regData, firstName: e.target.value})} className={styles.input} placeholder="Adınız" />
             </div>
             <div className={styles.inputGroup}>
                 <label>Soyad</label>
-                <input type="text" required value={regData.lastName} onChange={(e) => setRegData({...regData, lastName: e.target.value})} className={styles.input} />
+                <input type="text" required value={regData.lastName} onChange={(e) => setRegData({...regData, lastName: e.target.value})} className={styles.input} placeholder="Soyadınız" />
             </div>
             <div className={styles.inputGroup}>
                 <label>E-Posta</label>
-                <input type="email" required value={regData.email} onChange={(e) => setRegData({...regData, email: e.target.value})} className={styles.input} />
+                <input type="email" required value={regData.email} onChange={(e) => setRegData({...regData, email: e.target.value})} className={styles.input} placeholder="ornek@mail.com" />
             </div>
             <div className={styles.inputGroup}>
                 <label>Telefon</label>
-                <input type="text" value={regData.phoneNumber} onChange={(e) => setRegData({...regData, phoneNumber: e.target.value})} className={styles.input} />
+                <input type="tel" pattern="[0-9]{10,11}" maxLength="11" value={regData.phoneNumber} onChange={(e) => setRegData({...regData, phoneNumber: e.target.value.replace(/[^0-9]/g, '')})} className={styles.input} placeholder="Örn: 05554443322" />
             </div>
             <div className={styles.inputGroup}>
                 <label>Unvan / Uzmanlık</label>
@@ -310,20 +348,25 @@ export default function LoginPage() {
                   <option value="Asistan Dr.">Asistan Doktor</option>
                 </select>
             </div>
-            <div className={styles.inputGroup}>
-                <label>Talep Edilen Şifre</label>
-                <input type="password" required minLength="6" value={regData.password} onChange={(e) => setRegData({...regData, password: e.target.value})} className={styles.input} />
-            </div>
           </div>
 
-          {error && <div className={styles.errorMsg}>{error}</div>}
+          <div style={{ marginTop: '0.75rem', padding: '0.75rem', background: 'rgba(255, 255, 255, 0.05)', borderRadius: '8px', fontSize: '0.8rem', color: '#9ca3af', lineHeight: '1.4' }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ verticalAlign: 'middle', marginRight: '6px', marginTop: '-2px' }}>
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+            Güvenlik gereği, ilk giriş şifreniz yönetici onayından sonra verilecektir.
+          </div>
 
-          <button type="submit" className={styles.submitBtn} disabled={loading}>
-            {loading ? 'Gönderiliyor...' : 'Talebi Gönder'}
+          {error && <div className={styles.error} style={{marginTop: '0.5rem', marginBottom: '0'}}>{error}</div>}
+
+          <button type="submit" className={styles.submitBtn} disabled={loading} style={{ marginTop: '0.75rem' }}>
+            {loading ? 'Gönderiliyor...' : 'Başvuru Talebini Gönder'}
           </button>
         </form>
 
-        <div className={styles.backLink} style={{marginTop: '1rem'}}>
+        <div className={styles.backLink} style={{marginTop: '0.75rem', justifyContent: 'center', width: '100%'}}>
             <button type="button" onClick={() => { setShowDoctorRegister(false); setError(''); }} className={styles.linkButton}>
               ← Giriş Ekranına Dön
             </button>
@@ -332,11 +375,61 @@ export default function LoginPage() {
     );
   };
 
+  const renderForcePasswordChangeForm = () => (
+    <div className={styles.loginCard} style={{ maxWidth: '480px' }}>
+      <h1 className={styles.title}>Hoş Geldiniz</h1>
+      <p className={styles.subtitle} style={{color: '#fca5a5'}}>Güvenliğiniz için yönetici tarafından verilen geçici şifrenizi değiştirmeniz gerekmektedir.</p>
+      
+      {error && (
+        <div className={styles.error}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+          {error}
+        </div>
+      )}
+
+      <form className={styles.form} onSubmit={handleForceChangeSubmit}>
+        <div className={styles.inputGroup}>
+          <label className={styles.label}>Yeni Kalıcı Şifre</label>
+          <input
+            type="password"
+            className={styles.input}
+            placeholder="Yeni şifrenizi giriniz"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+        </div>
+        <div className={styles.inputGroup}>
+          <label className={styles.label}>Yeni Şifre (Tekrar)</label>
+          <input
+            type="password"
+            className={styles.input}
+            placeholder="Şifrenizi tekrar giriniz"
+            value={passwordConfirm}
+            onChange={(e) => setPasswordConfirm(e.target.value)}
+            required
+          />
+        </div>
+        
+        <button type="submit" className={styles.button} disabled={loading} style={{background: 'linear-gradient(135deg, #10b981, #059669)', boxShadow: '0 4px 14px 0 rgba(16, 185, 129, 0.39)', marginTop: '1.5rem'}}>
+          {loading ? 'Güncelleniyor...' : 'Şifremi Belirle ve Giriş Yap'}
+        </button>
+      </form>
+    </div>
+  );
+
   return (
     <div className={styles.container}>
-      {loginType === null 
-        ? renderInitialSelection() 
-        : (showDoctorRegister ? renderDoctorRegisterForm() : renderLoginForm())}
+      {showForcePasswordChange 
+        ? renderForcePasswordChangeForm() 
+        : (loginType === null 
+            ? renderInitialSelection() 
+            : (showDoctorRegister ? renderDoctorRegisterForm() : renderLoginForm()))
+      }
     </div>
   );
 }

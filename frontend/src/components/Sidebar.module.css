@@ -1,115 +1,214 @@
+/* ── SIDEBAR ── */
 .sidebar {
-  width: 260px;
-  min-width: 260px;
-  max-width: 260px;
-  background-color: var(--surface);
+  width: 76px;
+  min-width: 76px;
+  background-color: var(--sidebar-bg);
   border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
   height: 100vh;
   flex-shrink: 0;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  transition: width 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+              min-width 0.28s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.sidebar.collapsed {
-  width: 80px;
-  min-width: 80px;
-  max-width: 80px;
+.sidebar.expanded {
+  width: 250px;
+  min-width: 250px;
+  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.08);
 }
 
+/* ── LOGO ── */
 .logo {
-  padding: 1.5rem;
+  padding: 1.1rem;
   border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.75rem;
+  min-height: 64px;
+  flex-shrink: 0;
 }
 
 .logoIcon {
-  width: 40px;
-  height: 40px;
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
   background: linear-gradient(135deg, var(--primary), var(--primary-hover));
-  color: white;
   border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 8px rgba(var(--primary-rgb), 0.15);
+  transition: transform 0.2s ease;
+}
+
+.sidebar:hover .logoIcon {
+  transform: scale(1.04);
 }
 
 .logoIcon svg {
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
 }
 
 .logoText {
   display: flex;
   flex-direction: column;
+  white-space: nowrap;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.expanded .logoText {
+  opacity: 1;
+  transform: translateX(0);
+  transition-delay: 0.08s;
 }
 
 .logoText h2 {
-  font-size: 1.25rem;
-  font-weight: 900;
-  letter-spacing: -0.5px;
+  font-size: 1.1rem;
+  font-weight: 800;
+  letter-spacing: -0.3px;
   margin: 0;
   line-height: 1.2;
   background: linear-gradient(90deg, var(--text-main), var(--primary));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  text-shadow: 0 2px 10px rgba(var(--primary-rgb), 0.2);
 }
 
 .logoText p {
   color: var(--text-muted);
-  font-size: 0.75rem;
+  font-size: 0.65rem;
   font-weight: 500;
   margin: 0;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 160px;
+  letter-spacing: 0.6px;
 }
 
+/* ── NAV ── */
 .nav {
   flex: 1;
-  padding: 1.5rem 1rem;
+  padding: 0.75rem 0.65rem;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.2rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
 }
 
+.nav::-webkit-scrollbar { display: none; }
+
+/* ── NAV ITEM ── */
 .navItem {
+  position: relative;
   display: flex;
   align-items: center;
-  padding: 0.75rem 1rem;
-  border-radius: 6px;
-  color: var(--text-main);
+  padding: 0.5rem 0.6rem;
+  border-radius: 10px;
+  color: var(--text-muted);
   font-weight: 600;
-  letter-spacing: 0.2px;
-  transition: all 0.2s ease;
+  font-size: 0.84rem;
+  transition: all 0.18s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  gap: 0.7rem;
 }
 
 .navItem:hover {
   background-color: var(--background);
+  color: var(--text-main);
 }
 
 .navItem.active {
-  background-color: var(--primary);
-  color: white;
+  background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.14), rgba(var(--primary-rgb), 0.06));
+  color: var(--primary);
 }
 
+/* ── ICON ── */
 .icon {
-  margin-right: 0.75rem;
-  font-size: 1.25rem;
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.18s ease;
+  border: 1px solid transparent;
 }
 
+.navItem.active .icon {
+  background: var(--primary) !important;
+  color: #fff !important;
+  border-color: transparent !important;
+  box-shadow: 0 3px 8px rgba(var(--primary-rgb), 0.25);
+}
+
+/* ── NAV NAME ── */
+.navName {
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: opacity 0.18s ease, transform 0.18s ease;
+  pointer-events: none;
+}
+
+.expanded .navName {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+  transition-delay: 0.06s;
+}
+
+/* ── ACTIVE BAR ── */
+.activeBar {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 16px;
+  border-radius: 0 3px 3px 0;
+  background: var(--primary);
+  box-shadow: 2px 0 6px rgba(var(--primary-rgb), 0.3);
+}
+
+/* ── FOOTER ── */
 .footer {
-  padding: 1.5rem;
+  padding: 0.8rem;
   border-top: 1px solid var(--border);
-  text-align: center;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+  justify-content: center;
+}
+
+.footerVersion {
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: var(--primary);
+  background: rgba(var(--primary-rgb), 0.1);
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  letter-spacing: 0.3px;
+  border: 1px solid rgba(var(--primary-rgb), 0.15);
+  flex-shrink: 0;
+}
+
+.footerText {
+  font-size: 0.65rem;
   color: var(--text-muted);
-  font-size: 0.75rem;
+  white-space: nowrap;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 0.18s ease;
+}
+
+.expanded .footerText {
+  opacity: 1;
+  transition-delay: 0.08s;
 }

@@ -33,8 +33,22 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String username = null;
         String jwt = null;
 
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+        // 1. Önce HttpOnly Cookie'ye bakıyoruz (Güvenli Yöntem)
+        if (request.getCookies() != null) {
+            for (jakarta.servlet.http.Cookie cookie : request.getCookies()) {
+                if ("jwt".equals(cookie.getName())) {
+                    jwt = cookie.getValue();
+                    break;
+                }
+            }
+        }
+
+        // 2. Cookie yoksa Authorization header'a bakıyoruz (Geriye Dönük Uyumluluk veya Mobil)
+        if (jwt == null && authHeader != null && authHeader.startsWith("Bearer ")) {
             jwt = authHeader.substring(7);
+        }
+
+        if (jwt != null && !jwt.isEmpty()) {
             try {
                 username = jwtUtil.extractUsername(jwt);
             } catch (io.jsonwebtoken.ExpiredJwtException e) {

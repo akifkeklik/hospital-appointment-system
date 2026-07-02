@@ -34,7 +34,10 @@ import com.hospital.appointmentsystem.user.api.UserService;
  * ║                                                                  ║
  * ╚══════════════════════════════════════════════════════════════════╝
  */
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+
 @SpringBootApplication
+@EnableJpaAuditing(auditorAwareRef = "auditorAware")
 public class HospitalAppointmentApplication {
 
     public static void main(String[] args) {

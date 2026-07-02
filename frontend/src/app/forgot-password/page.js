@@ -47,7 +47,11 @@ export default function ForgotPasswordPage() {
   return (
     <div className={styles.container}>
       <div className={styles.loginCard} style={{ maxWidth: '450px' }}>
-        <div className={styles.logo}>HRS</div>
+        <div className={styles.logo}>
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="#ffffff" stroke="rgba(255,255,255,0.4)" strokeWidth="0.5">
+            <path d="M 19 3 A 10 10 0 1 0 19 21 A 9.5 9.5 0 1 1 19 3 Z" />
+          </svg>
+        </div>
         <h1 className={styles.title}>Şifremi Unuttum</h1>
         <p className={styles.subtitle}>Şifrenizi sıfırlamak için bilgilerinizi doğrulayın.</p>
 
@@ -67,19 +71,19 @@ export default function ForgotPasswordPage() {
               className={styles.input}
               placeholder="11 haneli TC kimlik no"
               value={formData.tcIdentityNumber}
-              onChange={handleChange}
+              onChange={(e) => setFormData({...formData, tcIdentityNumber: e.target.value.replace(/[^0-9]/g, '')})}
               maxLength={11}
               required
             />
           </div>
 
           <div className={styles.inputGroup}>
-            <label className={styles.label}>Kayıtlı E-Posta</label>
+            <label className={styles.label}>E-Posta</label>
             <input
               type="email"
               name="email"
               className={styles.input}
-              placeholder="Sisteme kayıtlı mail adresiniz"
+              placeholder="Kayıtlı e-posta adresiniz"
               value={formData.email}
               onChange={handleChange}
               required
@@ -92,11 +96,10 @@ export default function ForgotPasswordPage() {
               type="password"
               name="newPassword"
               className={styles.input}
-              placeholder="En az 6 karakter"
+              placeholder="Yeni şifrenizi giriniz"
               value={formData.newPassword}
               onChange={handleChange}
               required
-              minLength={6}
             />
           </div>
 

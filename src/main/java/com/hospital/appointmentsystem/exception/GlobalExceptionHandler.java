@@ -44,6 +44,20 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * Optimistic Locking hatasını yakalar. (Aynı randevunun aynı anda alınması)
+     */
+    @ExceptionHandler(org.springframework.orm.ObjectOptimisticLockingFailureException.class)
+    public ResponseEntity<Map<String, Object>> handleOptimisticLockingException(org.springframework.orm.ObjectOptimisticLockingFailureException ex) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("timestamp", LocalDateTime.now());
+        response.put("status", HttpStatus.CONFLICT.value());
+        response.put("error", "Conflict");
+        response.put("message", "Sistem çakışması tespit edildi! Bu randevu slotu saniyeler önce başka bir hasta tarafından alınmış veya işlem güncellenmiş olabilir. Lütfen sayfayı yenileyip tekrar deneyin.");
+        
+        return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+    }
+
+    /**
      * Diğer tüm beklenmedik hataları yakalar (Fallback).
      */
     @ExceptionHandler(Exception.class)
